@@ -1,0 +1,40 @@
+<% content_for(:title) { "カテゴリ" } %>
+
+<div class="min-h-screen bg-gray-50">
+  <main class="mx-auto max-w-md px-4 py-12">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-gray-900">カテゴリ</h1>
+      <%= link_to "＋ 追加", new_category_path,
+          class: "rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
+    </div>
+    <p class="mt-2 text-sm text-gray-500">
+      支出が登録されているカテゴリは削除できません。
+    </p>
+
+    <div class="mt-8 overflow-hidden rounded-xl bg-white shadow-sm">
+      <% if @categories.any? %>
+        <ul class="divide-y">
+          <% @categories.each do |category| %>
+            <li class="flex items-center justify-between px-6 py-4">
+              <span class="text-gray-900"><%= category.name %></span>
+
+              <div class="flex items-center gap-2">
+                <%= link_to "編集", edit_category_path(category),
+                    class: "rounded border px-3 py-1 text-sm hover:bg-gray-100" %>
+                <%= button_to "削除", category_path(category), method: :delete,
+                    form: { data: { turbo_confirm: "「#{category.name}」を削除しますか？" } },
+                    class: "rounded border border-red-200 px-3 py-1 text-sm text-red-600 hover:bg-red-50" %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="px-6 py-8 text-center text-sm text-gray-500">カテゴリがありません。</p>
+      <% end %>
+    </div>
+
+    <div class="mt-8 text-center">
+      <%= link_to "ホームへ戻る", root_path, class: "text-sm font-semibold text-blue-600 hover:underline" %>
+    </div>
+  </main>
+</div>
