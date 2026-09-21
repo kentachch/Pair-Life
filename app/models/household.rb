@@ -4,6 +4,7 @@ class Household < ApplicationRecord
   has_many :household_members, dependent: :destroy
   has_many :users, through: :household_members
   has_many :categories, dependent: :destroy
+  has_many :expenses, dependent: :destroy
   # 世帯・家族・パートナー同士の名前
   validates :name, presence: true
 
