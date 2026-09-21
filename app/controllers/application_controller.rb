@@ -16,4 +16,13 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit(:sign_up, keys: [ :name ])          # 新規登録
     devise_parameter_sanitizer.permit(:account_update, keys: [ :name ])   # アカウント編集
   end
+
+  def require_household
+    redirect_to new_household_path, alert: "世帯を作成してください" unless current_user.household
+  end
+
+  # すでに世帯に所属しているユーザーは、作成・参加画面を使えないようにする
+  def reject_household_member
+    redirect_to root_path, alert: "世帯のメンバーはアクセスできません" if current_user.household
+  end
 end
