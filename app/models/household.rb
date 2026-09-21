@@ -13,6 +13,24 @@ class Household < ApplicationRecord
     household_members.count >= MAX_MEMBERS
   end
 
+  # 世帯を作成し、作成者を1人目のメンバーとして登録する
+  # 途中で失敗したら両方なかったことにするため、トランザクションでまとめる
+  def self.create_with_owner!(name:, user:)
+    transaction do
+      household = create!(name: name)
+      household.household_members.create!(user: user)
+      household
+    end
+  end
+
+  # 世帯にメンバーを追加するメソッド
+  def add_member!(user)
+    transaction do
+      household_members.create!(user: user)
+      update!(invite_code: nil) if full? # 2人そろったら招待コードを無効にする
+    end
+  end
+
   private
 
   def generate_invite_code
