@@ -3,9 +3,9 @@
 one:
   household: one
   user: one
-  burden_ratio: 1
+  burden_ratio: 50
 
 two:
   household: two
   user: two
-  burden_ratio: 1
+  burden_ratio: 50
