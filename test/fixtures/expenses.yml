@@ -1,17 +1,18 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# payer は users テーブルを参照する。category は同じ世帯のカテゴリを指定する
 
 one:
   household: one
   payer: one
-  category: one
-  amount: 1
-  spent_on: 2026-09-21
-  memo: MyString
+  category: food
+  amount: 3000
+  spent_on: 2026-09-01
+  memo: スーパー
 
 two:
   household: two
   payer: two
-  category: two
-  amount: 1
-  spent_on: 2026-09-21
-  memo: MyString
+  category: other_household_food
+  amount: 5000
+  spent_on: 2026-09-01
+  memo: 他の世帯の支出

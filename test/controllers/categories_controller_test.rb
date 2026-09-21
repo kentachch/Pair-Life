@@ -63,12 +63,22 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
 
   # --- 削除 ---
 
-  test "カテゴリを削除できる" do
+  test "支出のないカテゴリは削除できる" do
     assert_difference "Category.count", -1 do
+      delete category_url(categories(:rent))
+    end
+
+    assert_redirected_to categories_url
+  end
+
+  test "支出が登録されているカテゴリは削除できない" do
+    # フィクスチャで categories(:food) には expenses(:one) が登録されている
+    assert_no_difference "Category.count" do
       delete category_url(categories(:food))
     end
 
     assert_redirected_to categories_url
+    assert_not_nil flash[:alert]
   end
 
   # --- 他の世帯のカテゴリ(権限チェック) ---
