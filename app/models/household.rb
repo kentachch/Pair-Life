@@ -35,7 +35,7 @@ class Household < ApplicationRecord
 
   def generate_invite_code
     loop do # 無限に繰り返す処理
-      self.invite_code = SecureRandom.hex(4) # 8文字のランダムな16進数を生成
+      self.invite_code = SecureRandom.hex(4).upcase # 8文字のランダムな16進数を生成し、読みやすいよう大文字にする
       break unless Household.exists?(invite_code: invite_code) # 重複がなければループを抜ける
       # 同じ招待コードが既にデータベースに存在するか？」を確認する処理
       # unless：条件が false のときに実行する
