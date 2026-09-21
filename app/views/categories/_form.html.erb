@@ -1,6 +1,5 @@
-<%# new と edit で共用するフォーム。category が新規か既存かで送信先が自動で切り替わる %>
 <%= form_with model: category do |f| %>
-  <%# 入力エラーがあるときだけ、エラーメッセージを表示する %>
+
   <% if category.errors.any? %>
     <div class="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-700">
       <ul class="list-inside list-disc">
