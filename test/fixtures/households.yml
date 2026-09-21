@@ -1,0 +1,10 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# フィクスチャは before_create を通らないため、invite_code は重複しない値を手で指定する
+
+one:
+  name: 世帯1
+  invite_code: INVITE01
+
+two:
+  name: 世帯2
+  invite_code: INVITE02

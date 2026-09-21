@@ -10,9 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_21_043032) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_21_054336) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "household_members", force: :cascade do |t|
+    t.integer "burden_ratio", default: 50, null: false # 負担の割合
+    t.datetime "created_at", null: false
+    t.bigint "household_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["household_id"], name: "index_household_members_on_household_id"
+    t.index ["user_id"], name: "index_household_members_on_user_id", unique: true
+  end
+
+  create_table "households", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "invite_code"
+    t.string "name", null: false # 家族・世帯・パートナー同士の名前
+    t.datetime "updated_at", null: false
+    t.index ["invite_code"], name: "index_households_on_invite_code", unique: true
+  end
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -26,4 +44,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_043032) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "household_members", "households"
+  add_foreign_key "household_members", "users"
 end

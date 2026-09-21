@@ -11,6 +11,11 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+
+    # フィクスチャ以外のユーザーが必要なテストで使う
+    def create_user(email:, name: "テストユーザー")
+      User.create!(email: email, name: name, password: "password")
+    end
   end
 end
 
