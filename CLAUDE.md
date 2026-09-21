@@ -84,6 +84,7 @@ docker compose exec web bin/rails db:migrate
 - 1人のユーザーが所属できる世帯は **1つのみ**(`household_members.user_id` はユニーク)
 - 2人目は、世帯作成時に発行される招待コードを入力して参加する
 - 招待コードは2人そろった時点で無効になる
+- パートナーの参加前(1人の状態)でも支出は登録できる。精算画面は2人そろってから表示する
 - 世帯からの退出・アカウント削除は MVP では実装しない(Devise の登録削除機能も画面に出さない)
 
 ### 支出(Expense)
@@ -108,6 +109,8 @@ docker compose exec web bin/rails db:migrate
 - 精算額が 0 円の月も記録できるよう、`from_user` / `to_user` は `optional: true`
 - 精算はどちらのメンバーでも取り消せる。取り消すとその月の支出が再び編集可能になる
 - 精算済みかどうかの判定は「その月の `settlements` レコードが存在するか」で行う
+- `settlements` は `household_id` と `target_month` の組み合わせにユニークインデックスを付ける(1世帯1か月につき1件)
+- `target_month` には対象月の1日(例: 2026-09-01)を保存する
 
 ### 負担割合
 
