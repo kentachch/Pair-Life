@@ -1,8 +1,9 @@
 class Household < ApplicationRecord
   MAX_MEMBERS = 2
-
+  DEFAULT_CATEGORY_NAMES = %w[家賃 水道代 電気代 ガス代 食費 日用品 外食 雑費 交際費 その他].freeze
   has_many :household_members, dependent: :destroy
   has_many :users, through: :household_members
+  has_many :categories, dependent: :destroy
   # 世帯・家族・パートナー同士の名前
   validates :name, presence: true
 
@@ -18,6 +19,11 @@ class Household < ApplicationRecord
   def self.create_with_owner!(name:, user:) # nameとuserを引数として受け取る
     transaction do
       household = create!(name: name)
+
+      # 世帯作成時に初期カテゴリを自動で作る
+      DEFAULT_CATEGORY_NAMES.each do |category_name|
+        household.categories.create!(name: category_name)
+      end
       household.household_members.create!(user: user)
       household
     end

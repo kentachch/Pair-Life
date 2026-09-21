@@ -10,12 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_21_054336) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_21_083315) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
+  create_table "categories", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "household_id", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["household_id", "name"], name: "index_categories_on_household_id_and_name", unique: true
+    t.index ["household_id"], name: "index_categories_on_household_id"
+  end
+
   create_table "household_members", force: :cascade do |t|
-    t.integer "burden_ratio", default: 50, null: false # 負担の割合
+    t.integer "burden_ratio", default: 50, null: false
     t.datetime "created_at", null: false
     t.bigint "household_id", null: false
     t.datetime "updated_at", null: false
@@ -27,7 +36,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_054336) do
   create_table "households", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "invite_code"
-    t.string "name", null: false # 家族・世帯・パートナー同士の名前
+    t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["invite_code"], name: "index_households_on_invite_code", unique: true
   end
@@ -45,6 +54,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_054336) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "categories", "households"
   add_foreign_key "household_members", "households"
   add_foreign_key "household_members", "users"
 end

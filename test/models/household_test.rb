@@ -89,4 +89,10 @@ class HouseholdTest < ActiveSupport::TestCase
 
     assert_equal "INVITE01", household.reload.invite_code
   end
+
+  test "create_with_owner! で初期カテゴリが作られる" do
+    household = Household.create_with_owner!(name: "テスト家", user: create_user(email: "owner@example.com"))
+
+    assert_equal Household::DEFAULT_CATEGORY_NAMES.sort, household.categories.pluck(:name).sort
+  end
 end
