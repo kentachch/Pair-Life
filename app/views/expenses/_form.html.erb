@@ -1,15 +1,6 @@
-<%# new と edit で共用するフォーム。expense が新規か既存かで送信先が自動で切り替わる %>
 <%= form_with model: expense do |f| %>
-  <%# 入力エラーがあるときだけ、エラーメッセージを表示する %>
-  <% if expense.errors.any? %>
-    <div class="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-700">
-      <ul class="list-inside list-disc">
-        <% expense.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%# エラーメッセージ %>
+  <%= render "shared/error_messages", object: expense %>
 
   <div class="space-y-4">
     <div>
