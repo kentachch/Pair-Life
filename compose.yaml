@@ -26,6 +26,18 @@ services:
     stdin_open: true
     tty: true
 
+  # Tailwind の CSS を監視して、変更があれば自動で作り直す
+  # [always] を付けないと、Docker 内では入力待ちがなくなった時点で終了してしまう
+  css:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bin/rails tailwindcss:watch[always]
+    volumes:
+      - .:/app
+      - bundle:/usr/local/bundle
+    tty: true
+
 volumes:
   pgdata:
   bundle:

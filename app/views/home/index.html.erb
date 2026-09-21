@@ -1,0 +1,168 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- ヘッダー -->
+  <header class="border-b bg-white">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+      <h1 class="text-xl font-bold text-gray-900">
+        共同家計管理アプリ
+      </h1>
+
+      <div class="flex items-center gap-4">
+        <% if user_signed_in? %>
+            <div class="flex items-center justify-end gap-4 p-4">
+                <span><%= current_user.name %> さん</span>
+                <%= button_to "ログアウト", destroy_user_session_path, method: :delete,
+                    class: "rounded border px-3 py-1 hover:bg-gray-100" %>
+            </div>
+        <% end %>
+    </div>
+  </header>
+
+  <!-- メイン -->
+  <main class="mx-auto max-w-6xl px-4 py-8">
+    <!-- ページタイトル -->
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900">
+          家計一覧
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">
+          共同で管理している家計の支出を確認できます。
+        </p>
+      </div>
+
+      <%= link_to "＋ 支出を追加",
+          "#",
+          class: "rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
+    </div>
+
+    <!-- 今月の集計 -->
+    <div class="mb-8 grid gap-4 sm:grid-cols-3">
+      <div class="rounded-xl bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-gray-500">
+          今月の支出
+        </p>
+        <p class="mt-2 text-2xl font-bold text-gray-900">
+          ¥128,500
+        </p>
+      </div>
+
+      <div class="rounded-xl bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-gray-500">
+          食費
+        </p>
+        <p class="mt-2 text-2xl font-bold text-gray-900">
+          ¥45,800
+        </p>
+      </div>
+
+      <div class="rounded-xl bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-gray-500">
+          その他
+        </p>
+        <p class="mt-2 text-2xl font-bold text-gray-900">
+          ¥82,700
+        </p>
+      </div>
+    </div>
+
+    <!-- 支出一覧 -->
+    <div class="overflow-hidden rounded-xl bg-white shadow-sm">
+      <div class="border-b px-6 py-4">
+        <h3 class="font-semibold text-gray-900">
+          最近の支出
+        </h3>
+      </div>
+
+      <div class="divide-y">
+        <!-- 支出1 -->
+        <div class="flex items-center justify-between px-6 py-5">
+          <div class="flex items-center gap-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+              🍚
+            </div>
+
+            <div>
+              <p class="font-medium text-gray-900">
+                スーパー
+              </p>
+              <p class="text-sm text-gray-500">
+                食費 ・ 2026/09/21
+              </p>
+            </div>
+          </div>
+
+          <p class="font-semibold text-gray-900">
+            ¥5,280
+          </p>
+        </div>
+
+        <!-- 支出2 -->
+        <div class="flex items-center justify-between px-6 py-5">
+          <div class="flex items-center gap-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+              🚃
+            </div>
+
+            <div>
+              <p class="font-medium text-gray-900">
+                電車
+              </p>
+              <p class="text-sm text-gray-500">
+                交通費 ・ 2026/09/20
+              </p>
+            </div>
+          </div>
+
+          <p class="font-semibold text-gray-900">
+            ¥860
+          </p>
+        </div>
+
+        <!-- 支出3 -->
+        <div class="flex items-center justify-between px-6 py-5">
+          <div class="flex items-center gap-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100">
+              🏠
+            </div>
+
+            <div>
+              <p class="font-medium text-gray-900">
+                家賃
+              </p>
+              <p class="text-sm text-gray-500">
+                住居費 ・ 2026/09/20
+              </p>
+            </div>
+          </div>
+
+          <p class="font-semibold text-gray-900">
+            ¥80,000
+          </p>
+        </div>
+
+        <!-- 支出4 -->
+        <div class="flex items-center justify-between px-6 py-5">
+          <div class="flex items-center gap-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
+              🎬
+            </div>
+
+            <div>
+              <p class="font-medium text-gray-900">
+                映画
+              </p>
+              <p class="text-sm text-gray-500">
+                娯楽費 ・ 2026/09/19
+              </p>
+            </div>
+          </div>
+
+          <p class="font-semibold text-gray-900">
+            ¥3,600
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+

@@ -1,0 +1,113 @@
+<div class="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+    <h2 class="mb-8 text-center text-2xl font-bold text-gray-900">
+      アカウント情報の編集
+    </h2>
+
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <div class="space-y-6">
+        <!-- 名前 -->
+        <div>
+          <%= f.label :name, class: "mb-2 block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :name,
+              autofocus: true,
+              class: "block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" %>
+        </div>
+
+        <!-- メールアドレス -->
+        <div>
+          <%= f.label :email, class: "mb-2 block text-sm font-medium text-gray-700" %>
+          <%= f.email_field :email,
+              autocomplete: "email",
+              class: "block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" %>
+        </div>
+
+        <!-- 再確認待ち -->
+        <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+          <div class="rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800">
+            <p class="font-medium">メールアドレスの確認待ち</p>
+            <p class="mt-1">
+              現在、<%= resource.unconfirmed_email %> の確認を待っています。
+            </p>
+          </div>
+        <% end %>
+
+        <!-- 新しいパスワード -->
+        <div>
+          <%= f.label :password, class: "mb-2 block text-sm font-medium text-gray-700" %>
+
+          <p class="mb-2 text-sm text-gray-500">
+            パスワードを変更しない場合は空欄にしてください。
+          </p>
+
+          <%= f.password_field :password,
+              autocomplete: "new-password",
+              class: "block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" %>
+
+          <% if @minimum_password_length %>
+            <p class="mt-2 text-sm text-gray-500">
+              <%= @minimum_password_length %>文字以上
+            </p>
+          <% end %>
+        </div>
+
+        <!-- パスワード確認 -->
+        <div>
+          <%= f.label :password_confirmation, class: "mb-2 block text-sm font-medium text-gray-700" %>
+
+          <%= f.password_field :password_confirmation,
+              autocomplete: "new-password",
+              class: "block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" %>
+        </div>
+
+        <!-- 現在のパスワード -->
+        <div>
+          <%= f.label :current_password, class: "mb-2 block text-sm font-medium text-gray-700" %>
+
+          <p class="mb-2 text-sm text-gray-500">
+            変更内容を確認するため、現在のパスワードを入力してください。
+          </p>
+
+          <%= f.password_field :current_password,
+              autocomplete: "current-password",
+              class: "block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" %>
+        </div>
+
+        <!-- 更新ボタン -->
+        <div>
+          <%= f.submit "更新",
+              class: "w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- アカウント削除 -->
+    <div class="mt-8 border-t border-gray-200 pt-6">
+      <h3 class="mb-2 text-lg font-semibold text-gray-900">
+        アカウントの削除
+      </h3>
+
+      <p class="mb-4 text-sm text-gray-500">
+        アカウントを削除すると、元に戻すことはできません。
+      </p>
+
+      <%= button_to "アカウントを削除",
+          registration_path(resource_name),
+          data: {
+            confirm: "本当にアカウントを削除しますか？",
+            turbo_confirm: "本当にアカウントを削除しますか？"
+          },
+          method: :delete,
+          class: "w-full rounded-lg border border-red-300 bg-white px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" %>
+    </div>
+
+    <!-- 戻る -->
+    <div class="mt-6 text-center">
+      <%= link_to "戻る",
+          :back,
+          class: "text-sm font-medium text-gray-600 transition hover:text-gray-900" %>
+    </div>
+  </div>
+</div>

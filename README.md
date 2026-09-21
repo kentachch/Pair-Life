@@ -23,7 +23,7 @@
 
 | 機能 | 内容 |
 | --- | --- |
-| ユーザー認証 | メールアドレスとパスワードでの新規登録・ログイン |
+| ユーザー認証 | メールアドレスとパスワードでの新規登録・ログイン・パスワード再設定(Devise) |
 | 世帯管理 | 世帯を作成し、表示される招待コードを相手が入力して参加 |
 | 支出登録 | 金額・日付・カテゴリ・支払った人・メモを登録、編集、削除 |
 | カテゴリ管理 | 初期カテゴリに加え、自由に追加・変更・削除 |
@@ -65,13 +65,6 @@
 
 > 例:Aさん 120,000円、Bさん 80,000円 → BさんがAさんに 20,000円 支払う
 
-## 今後の追加予定
-
-- 支出の小分類(野菜、魚など)
-- Googleログイン、LINEログイン
-- 負担割合の変更(収入に応じて6:4にするなど)
-- 世帯からの退出・アカウント削除
-
 ## 技術スタック
 
 | 項目 | 内容 |
@@ -80,7 +73,7 @@
 | フレームワーク | Rails 8.1.3.1 |
 | データベース | PostgreSQL 17 |
 | 開発環境 | Docker / Docker Compose |
-| 認証 | Rails 8 標準の認証ジェネレータ |
+| 認証 | Devise |
 
 ## テーブル設計(MVP)
 
@@ -97,9 +90,12 @@ erDiagram
 
     users {
         bigint id PK
-        string email_address
-        string password_digest
+        string email "ユニーク"
+        string encrypted_password
         string name
+        string reset_password_token
+        datetime reset_password_sent_at
+        datetime remember_created_at
     }
     households {
         bigint id PK
@@ -139,18 +135,27 @@ erDiagram
 
 | テーブル | 役割 |
 | --- | --- |
-| users | ユーザー情報 |
+| users | ユーザー情報。Devise で管理する(`name` は独自に追加) |
 | households | 世帯(2人で共有する家計の単位)。招待コードを持つ |
 | household_members | 世帯とユーザーを結ぶ中間テーブル。負担割合を持つ |
 | categories | 支出のカテゴリ。世帯ごとに管理する |
 | expenses | 支出。`payer_id` は「誰が払ったか」を表し、users テーブルを参照する |
 | settlements | 精算の記録。レコードがある月は精算済みとして扱う |
 
-※ Rails 8 標準の認証機能を使用するため、ログイン状態を管理する sessions テーブルも作成されます。
+※ users テーブルのうち `name` 以外のカラムは、`bin/rails g devise User` で自動生成されます。
 
 ### 主なモデルの関連
 
 ```ruby
+class User < ApplicationRecord
+  devise :database_authenticatable, :registerable,
+         :recoverable, :rememberable, :validatable
+
+  has_one :household_member, dependent: :destroy
+  has_one :household, through: :household_member
+  has_many :paid_expenses, class_name: "Expense", foreign_key: :payer_id
+end
+
 class Expense < ApplicationRecord
   belongs_to :household
   belongs_to :payer, class_name: "User"
@@ -166,11 +171,7 @@ end
 
 `payer_id`・`from_user_id`・`to_user_id` はいずれも users テーブルを参照するため、`class_name: "User"` を指定しています。settlements の `from_user` / `to_user` は、精算額が0円の月も精算済みとして記録できるよう空を許可しています。
 
-# MVP後の開発計画
-
-MVPリリース後に追加したい機能をまとめます。
-
-## 追加予定の機能
+## MVP後の開発計画
 
 ### 1. レシート撮影による支出入力(OCR)
 
@@ -192,7 +193,7 @@ MVPリリース後に追加したい機能をまとめます。
 
 メールアドレスとパスワードに加え、外部サービスでのログインに対応します。
 
-- `omniauth` 系のGemで追加できる
+- Devise の `omniauthable` モジュールと、`omniauth-google-oauth2`・`omniauth-line` などの Gem で追加する
 
 ### 4. 負担割合の変更
 
@@ -204,8 +205,9 @@ MVPリリース後に追加したい機能をまとめます。
 ### 5. 世帯からの退出・アカウント削除
 
 - 退出したメンバーが登録した支出や精算記録の扱いを決める必要があり、実装は複雑になる
+- アカウント削除は Devise の `registerable` に標準で含まれるが、MVPでは画面に表示しない
 
-## 着手する順番
+### 着手する順番
 
 **レシートOCRを最優先**とします。「入力の手間」という開発当初の課題に最も直接効く機能であり、このアプリならではの価値になるためです。
 
@@ -213,15 +215,9 @@ MVPリリース後に追加したい機能をまとめます。
 
 ---
 
-## 動作環境
+## 環境構築
 
-| 項目 | バージョン |
-| --- | --- |
-| Ruby | 3.4.10 |
-| Rails | 8.1.3.1 |
-| PostgreSQL | 17 |
-
-## 事前準備
+### 事前準備
 
 以下がインストールされていることを確認してください。
 
@@ -233,8 +229,6 @@ docker -v
 docker compose version
 git -v
 ```
-
-## 環境構築手順
 
 ### 1. リポジトリをクローン
 
@@ -305,9 +299,6 @@ docker compose exec web bin/rails db:rollback
 
 # ルーティング確認
 docker compose exec web bin/rails routes
-
-# scaffold作成(例)
-docker compose exec web bin/rails g scaffold Post title:string body:text
 ```
 
 ### Gemの追加
@@ -317,6 +308,60 @@ docker compose exec web bin/rails g scaffold Post title:string body:text
 ```bash
 docker compose exec web bundle install
 docker compose restart web
+```
+
+### Devise
+
+```bash
+# 導入(初回のみ)
+docker compose exec web bundle add devise
+docker compose exec web bin/rails g devise:install
+docker compose exec web bin/rails g devise User
+docker compose exec web bin/rails db:migrate
+
+# ログイン・新規登録画面をカスタマイズする場合
+docker compose exec web bin/rails g devise:views
+```
+
+- `bin/rails g devise User` で生成されたマイグレーションに、`db:migrate` の前に `t.string :name, null: false` を追加する
+- `config/environments/development.rb` に `config.action_mailer.default_url_options = { host: "localhost", port: 3000 }` を設定する(パスワード再設定メールで使用)
+
+## モデル・コントローラの生成
+
+### モデル
+
+モデル名は単数形・先頭大文字。生成後は必ずマイグレーションを実行する。
+
+```bash
+docker compose exec web bin/rails g model Post title:string body:text
+docker compose exec web bin/rails db:migrate
+```
+
+主なカラムの型:`string` / `text` / `integer` / `boolean` / `date` / `datetime` / `references`
+
+### コントローラ
+
+コントローラ名は複数形・先頭大文字。
+
+```bash
+docker compose exec web bin/rails g controller Posts index show
+```
+
+### scaffold(モデル・コントローラ・画面を一括生成)
+
+```bash
+docker compose exec web bin/rails g scaffold Post title:string body:text
+docker compose exec web bin/rails db:migrate
+```
+
+### 生成したファイルの削除
+
+マイグレーション実行済みの場合は、先に `db:rollback` を行う。
+
+```bash
+docker compose exec web bin/rails db:rollback
+docker compose exec web bin/rails d model Post
+docker compose exec web bin/rails d controller Posts
 ```
 
 ## トラブルシューティング
@@ -357,42 +402,4 @@ docker compose exec web bin/rails db:prepare
 | --- | --- |
 | `Dockerfile.dev` | 開発用のDockerイメージ定義 |
 | `compose.yaml` | 開発用コンテナ(web / db)の構成 |
-| `Dockerfile` | 本番用(Railsが自動生成) |# rails-app
-
-## モデル・コントローラの生成
-
-### モデル
-
-モデル名は単数形・先頭大文字。生成後は必ずマイグレーションを実行する。
-
-```bash
-docker compose exec web bin/rails g model Post title:string body:text
-docker compose exec web bin/rails db:migrate
-```
-
-主なカラムの型:`string` / `text` / `integer` / `boolean` / `date` / `datetime` / `references`
-
-### コントローラ
-
-コントローラ名は複数形・先頭大文字。
-
-```bash
-docker compose exec web bin/rails g controller Posts index show
-```
-
-### scaffold(モデル・コントローラ・画面を一括生成)
-
-```bash
-docker compose exec web bin/rails g scaffold Post title:string body:text
-docker compose exec web bin/rails db:migrate
-```
-
-### 生成したファイルの削除
-
-マイグレーション実行済みの場合は、先に `db:rollback` を行う。
-
-```bash
-docker compose exec web bin/rails db:rollback
-docker compose exec web bin/rails d model Post
-docker compose exec web bin/rails d controller Posts
-```
+| `Dockerfile` | 本番用(Railsが自動生成) |

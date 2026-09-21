@@ -18,6 +18,7 @@
 | Ruby | 3.4.10 |
 | Rails | 8.1.3.1 |
 | PostgreSQL | 17 |
+| 認証 | Devise |
 
 開発環境は Docker で構築しています。**ホスト側に Ruby / Rails はインストールされていません。**
 
@@ -42,10 +43,36 @@ docker compose exec web bundle install
 
 ## 認証について
 
-**Devise は使用しません。** Rails 8 標準の認証ジェネレータ(`bin/rails g authentication`)で生成したコードをベースにしています。
+**認証には Devise を使用します。** Rails 8 標準の認証ジェネレータ(`bin/rails g authentication`)は使用しません。
 
-- 認証関連のコードは原則としてリポジトリ内に生成済みのものを読み、必要に応じて手を加えてください
-- 新規登録画面はジェネレータが生成しないため、自前で実装しています
+既に Rails 8 標準認証のコード(`sessions` テーブル、`Current.user`、`Authentication` concern など)が生成されている場合は、削除して Devise の構成に置き換えてください。置き換える前に、削除対象のファイルを一覧にして確認を取ってください。
+
+### 導入手順
+
+```bash
+docker compose exec web bundle add devise
+docker compose exec web bin/rails g devise:install
+docker compose exec web bin/rails g devise User
+docker compose exec web bin/rails db:migrate
+```
+
+- `bin/rails g devise User` で生成されたマイグレーションに、`db:migrate` の前に `t.string :name, null: false` を追加する
+- `config/environments/development.rb` に `config.action_mailer.default_url_options = { host: "localhost", port: 3000 }` を設定する
+- 画面をカスタマイズする場合は `bin/rails g devise:views` でビューを生成する
+
+### MVP で有効にするモジュール
+
+`database_authenticatable`、`registerable`、`recoverable`、`rememberable`、`validatable`
+
+- メール確認(`confirmable`)などは MVP では使用しない
+- 将来の Google / LINE ログインは `omniauthable` と `omniauth` 系の Gem で追加する予定
+
+### 実装上のルール
+
+- ログイン必須の画面は、コントローラで `before_action :authenticate_user!` を使う
+- ログイン中のユーザーは `current_user` で取得する(`Current.user` は使わない)
+- 新規登録時に `name` を受け取るため、`ApplicationController` の `configure_permitted_parameters` で `name` を許可する
+- users テーブルのメールアドレスのカラム名は `email`(`email_address` ではない)
 
 ## ドメインルール(重要)
 
@@ -57,7 +84,7 @@ docker compose exec web bundle install
 - 1人のユーザーが所属できる世帯は **1つのみ**(`household_members.user_id` はユニーク)
 - 2人目は、世帯作成時に発行される招待コードを入力して参加する
 - 招待コードは2人そろった時点で無効になる
-- 世帯からの退出・アカウント削除は MVP では実装しない
+- 世帯からの退出・アカウント削除は MVP では実装しない(Devise の登録削除機能も画面に出さない)
 
 ### 支出(Expense)
 
@@ -92,7 +119,7 @@ docker compose exec web bundle install
 
 以下の順に、1段階ずつ動作確認しながら進めます。
 
-1. 認証(users / sessions、新規登録画面)
+1. 認証(Devise の導入、`name` を含む新規登録・ログイン・ログアウト)
 2. 世帯の作成と招待コードによる参加
 3. カテゴリの管理
 4. 支出の登録・一覧・編集・削除
