@@ -1,8 +1,9 @@
 class Household < ApplicationRecord
   MAX_MEMBERS = 2
-
+  DEFAULT_CATEGORY_NAMES = %w[家賃 水道 光熱費 ガス 食費 日用品 外食 雑費 交際費].freeze
   has_many :household_members, dependent: :destroy
   has_many :users, through: :household_members
+  has_many :categories, dependent: :destroy
   # 世帯・家族・パートナー同士の名前
   validates :name, presence: true
 
