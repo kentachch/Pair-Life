@@ -9,6 +9,7 @@
       <div class="flex items-center gap-4">
         <% if user_signed_in? %>
             <div class="flex items-center justify-end gap-4 p-4">
+                <%= link_to "支出", expenses_path, class: "text-sm text-gray-700 hover:text-blue-600" %>
                 <%= link_to "カテゴリ", categories_path, class: "text-sm text-gray-700 hover:text-blue-600" %>
                 <span><%= current_user.name %> さん</span>
                 <%= button_to "ログアウト", destroy_user_session_path, method: :delete,
@@ -33,7 +34,7 @@
       </div>
 
       <%= link_to "＋ 支出を追加",
-          "#",
+          new_expense_path,
           class: "rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
     </div>
 

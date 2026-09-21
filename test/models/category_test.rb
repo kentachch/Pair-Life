@@ -32,4 +32,12 @@ class CategoryTest < ActiveSupport::TestCase
 
     assert household.categories.build(name: "食費").valid?
   end
+
+  test "支出が登録されているカテゴリは削除できない" do
+    # フィクスチャで categories(:food) には expenses(:one) が登録されている
+    category = categories(:food)
+
+    assert_not category.destroy
+    assert Category.exists?(category.id)
+  end
 end

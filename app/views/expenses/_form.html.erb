@@ -1,0 +1,51 @@
+<%# new と edit で共用するフォーム。expense が新規か既存かで送信先が自動で切り替わる %>
+<%= form_with model: expense do |f| %>
+  <%# 入力エラーがあるときだけ、エラーメッセージを表示する %>
+  <% if expense.errors.any? %>
+    <div class="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-700">
+      <ul class="list-inside list-disc">
+        <% expense.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="space-y-4">
+    <div>
+      <%= f.label :amount, "金額(円)", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.number_field :amount, min: 1, step: 1, placeholder: "例：3000",
+          class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
+    </div>
+
+    <div>
+      <%= f.label :spent_on, "日付", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.date_field :spent_on,
+          class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
+    </div>
+
+    <div>
+      <%= f.label :category_id, "カテゴリ", class: "block text-sm font-medium text-gray-700" %>
+      <%# 選択肢は自分の世帯のカテゴリだけにする %>
+      <%= f.collection_select :category_id, current_user.household.categories.order(:created_at), :id, :name,
+          { prompt: "選択してください" },
+          class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
+    </div>
+
+    <div>
+      <%= f.label :payer_id, "支払った人", class: "block text-sm font-medium text-gray-700" %>
+      <%# 選択肢は自分の世帯のメンバーだけにする %>
+      <%= f.collection_select :payer_id, current_user.household.users, :id, :name, {},
+          class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
+    </div>
+
+    <div>
+      <%= f.label :memo, "メモ(任意)", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :memo, placeholder: "例：スーパーで買い物",
+          class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
+    </div>
+  </div>
+
+  <%= f.submit "保存する",
+      class: "mt-6 w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
+<% end %>
