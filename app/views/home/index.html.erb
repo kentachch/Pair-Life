@@ -9,11 +9,13 @@
       <div class="flex items-center gap-4">
         <% if user_signed_in? %>
             <div class="flex items-center justify-end gap-4 p-4">
+                <%= link_to "カテゴリ", categories_path, class: "text-sm text-gray-700 hover:text-blue-600" %>
                 <span><%= current_user.name %> さん</span>
                 <%= button_to "ログアウト", destroy_user_session_path, method: :delete,
                     class: "rounded border px-3 py-1 hover:bg-gray-100" %>
             </div>
         <% end %>
+      </div>
     </div>
   </header>
 
