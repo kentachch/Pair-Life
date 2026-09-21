@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  household: one
+  payer: one
+  category: one
+  amount: 1
+  spent_on: 2026-09-21
+  memo: MyString
+
+two:
+  household: two
+  payer: two
+  category: two
+  amount: 1
+  spent_on: 2026-09-21
+  memo: MyString
