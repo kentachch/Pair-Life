@@ -147,3 +147,41 @@ docker compose exec web bin/rails db:prepare
 | `Dockerfile.dev` | 開発用のDockerイメージ定義 |
 | `compose.yaml` | 開発用コンテナ(web / db)の構成 |
 | `Dockerfile` | 本番用(Railsが自動生成) |# rails-app
+
+## モデル・コントローラの生成
+
+### モデル
+
+モデル名は単数形・先頭大文字。生成後は必ずマイグレーションを実行する。
+
+```bash
+docker compose exec web bin/rails g model Post title:string body:text
+docker compose exec web bin/rails db:migrate
+```
+
+主なカラムの型:`string` / `text` / `integer` / `boolean` / `date` / `datetime` / `references`
+
+### コントローラ
+
+コントローラ名は複数形・先頭大文字。
+
+```bash
+docker compose exec web bin/rails g controller Posts index show
+```
+
+### scaffold(モデル・コントローラ・画面を一括生成)
+
+```bash
+docker compose exec web bin/rails g scaffold Post title:string body:text
+docker compose exec web bin/rails db:migrate
+```
+
+### 生成したファイルの削除
+
+マイグレーション実行済みの場合は、先に `db:rollback` を行う。
+
+```bash
+docker compose exec web bin/rails db:rollback
+docker compose exec web bin/rails d model Post
+docker compose exec web bin/rails d controller Posts
+```
