@@ -1,4 +1,29 @@
-<div>
-  <h1 class="font-bold text-4xl">Invitations#new</h1>
-  <p>Find me in app/views/invitations/new.html.erb</p>
+<% content_for(:title) { "招待コードで参加" } %>
+
+<div class="min-h-screen bg-gray-50">
+  <main class="mx-auto max-w-md px-4 py-12">
+    <h1 class="text-2xl font-bold text-gray-900">招待コードで参加する</h1>
+    <p class="mt-2 text-sm text-gray-500">
+      パートナーから受け取った招待コードを入力してください。
+    </p>
+
+    <div class="mt-8 rounded-xl bg-white p-6 shadow-sm">
+      <%# モデルに紐づかないフォームなので、url を指定して params[:invite_code] で受け取る %>
+      <%= form_with url: invitation_path do |f| %>
+        <div>
+          <%= f.label :invite_code, "招待コード", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :invite_code, value: params[:invite_code], autocomplete: "off",
+              class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 font-mono tracking-widest focus:border-blue-500 focus:outline-none" %>
+        </div>
+
+        <%= f.submit "参加する",
+            class: "mt-6 w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
+      <% end %>
+    </div>
+
+    <div class="mt-6 text-center text-sm text-gray-600">
+      招待コードをお持ちでない方は
+      <%= link_to "世帯を作成", new_household_path, class: "font-semibold text-blue-600 hover:underline" %>
+    </div>
+  </main>
 </div>

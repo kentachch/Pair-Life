@@ -1,4 +1,39 @@
-<div>
-  <h1 class="font-bold text-4xl">Households#new</h1>
-  <p>Find me in app/views/households/new.html.erb</p>
+<% content_for(:title) { "世帯の作成" } %>
+
+<div class="min-h-screen bg-gray-50">
+  <main class="mx-auto max-w-md px-4 py-12">
+    <h1 class="text-2xl font-bold text-gray-900">世帯を作成する</h1>
+    <p class="mt-2 text-sm text-gray-500">
+      世帯を作成すると招待コードが発行されます。パートナーにコードを伝えて参加してもらいましょう。
+    </p>
+
+    <div class="mt-8 rounded-xl bg-white p-6 shadow-sm">
+      <%= form_with model: @household, url: household_path do |f| %>
+        <%# 入力エラーがあるときだけ、エラーメッセージを表示する %>
+        <% if @household.errors.any? %>
+          <div class="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-700">
+            <ul class="list-inside list-disc">
+              <% @household.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div>
+          <%= f.label :name, "世帯名", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :name, placeholder: "例：山田家",
+              class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
+        </div>
+
+        <%= f.submit "世帯を作成する",
+            class: "mt-6 w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
+      <% end %>
+    </div>
+
+    <div class="mt-6 text-center text-sm text-gray-600">
+      パートナーから招待コードを受け取っている方は
+      <%= link_to "こちらから参加", new_invitation_path, class: "font-semibold text-blue-600 hover:underline" %>
+    </div>
+  </main>
 </div>
