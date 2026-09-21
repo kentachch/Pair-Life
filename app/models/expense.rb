@@ -23,4 +23,10 @@ class Expense < ApplicationRecord
     return if category.nil? || household.nil?
     errors.add(:category, "はこの世帯のカテゴリーではありません。") unless category.household_id == household.id
   end
+
+  scope :in_month, ->(date) { where(spent_on: date.all_month) }
+  # dateを引数として受け取って、その月の1日から末日までの範囲で絞り込むスコープを定義。
+
+  scope :recent, -> { order(spent_on: :desc, created_at: :desc) }
+  # 日付の新しい順。同じ日付なら後から登録したものを上にする
 end
