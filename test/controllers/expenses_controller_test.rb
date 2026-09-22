@@ -11,14 +11,58 @@ class ExpensesControllerTest < ActionDispatch::IntegrationTest
                  payer_id: users(:one).id, memo: "ドラッグストア" }.merge(attributes) }
   end
 
-  # --- 一覧 ---
-
   test "自分の世帯の支出だけが一覧に表示される" do
-    get expenses_url
+    get expenses_url(month: "2026-09")
 
     assert_response :success
     assert_match "スーパー", response.body
     assert_no_match "他の世帯の支出", response.body
+  end
+
+  test "指定した月の支出と合計だけが表示される" do
+    households(:one).expenses.create!(payer: users(:one), category: categories(:rent), amount: 80000,
+                                      spent_on: Date.new(2026, 9, 30), memo: "9月の家賃")
+    households(:one).expenses.create!(payer: users(:one), category: categories(:rent), amount: 70000,
+                                      spent_on: Date.new(2026, 10, 1), memo: "10月の家賃")
+
+    get expenses_url(month: "2026-09")
+
+    assert_select "h2", text: "2026年9月"
+    assert_match "9月の家賃", response.body
+    assert_no_match "10月の家賃", response.body
+    # expenses(:one) の 3000 円 + 80000 円
+    assert_match "¥83,000", response.body
+  end
+
+  test "前の月・次の月へのリンクがある" do
+    get expenses_url(month: "2026-01")
+
+    # 1月の前は前年の12月、次は2月
+    assert_select "a[href=?]", expenses_path(month: "2025-12")
+    assert_select "a[href=?]", expenses_path(month: "2026-02")
+  end
+
+  test "月を指定しなければ今月を表示する" do
+    travel_to Date.new(2026, 9, 22) do
+      get expenses_url
+    end
+
+    assert_select "h2", text: "2026年9月"
+  end
+
+  test "月の形式が正しくなければ今月を表示する" do
+    travel_to Date.new(2026, 9, 22) do
+      get expenses_url(month: "abc")
+    end
+
+    assert_response :success
+    assert_select "h2", text: "2026年9月"
+  end
+
+  test "一覧にはカテゴリのアイコンが表示される" do
+    get expenses_url(month: "2026-09")
+
+    assert_select "[data-icon=shopping-basket] svg"
   end
 
   # --- 登録 ---
@@ -36,7 +80,8 @@ class ExpensesControllerTest < ActionDispatch::IntegrationTest
       post expenses_url, params: valid_params
     end
 
-    assert_redirected_to expenses_url
+    # 登録した支出の月(2026-09)の一覧に戻る
+    assert_redirected_to expenses_url(month: "2026-09")
     expense = households(:one).expenses.order(:created_at).last
     assert_equal 1200, expense.amount
     assert_equal users(:one), expense.payer
@@ -76,7 +121,7 @@ class ExpensesControllerTest < ActionDispatch::IntegrationTest
   test "支出を変更できる" do
     patch expense_url(expenses(:one)), params: { expense: { amount: 4500 } }
 
-    assert_redirected_to expenses_url
+    assert_redirected_to expenses_url(month: "2026-09")
     assert_equal 4500, expenses(:one).reload.amount
   end
 
@@ -109,7 +154,7 @@ class ExpensesControllerTest < ActionDispatch::IntegrationTest
       delete expense_url(expenses(:one))
     end
 
-    assert_redirected_to expenses_url
+    assert_redirected_to expenses_url(month: "2026-09")
   end
 
   # --- 他の世帯の支出(権限チェック) ---

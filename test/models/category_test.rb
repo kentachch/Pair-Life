@@ -40,4 +40,15 @@ class CategoryTest < ActiveSupport::TestCase
     assert_not category.destroy
     assert Category.exists?(category.id)
   end
+
+  test "アイコンを指定しなければ tag になる" do
+    assert_equal Category::DEFAULT_ICON, households(:one).categories.build(name: "趣味").icon
+  end
+
+  test "候補にないアイコンは使えない" do
+    category = households(:one).categories.build(name: "趣味", icon: "not-exist-icon")
+
+    assert_not category.valid?
+    assert category.errors.of_kind?(:icon, :inclusion)
+  end
 end

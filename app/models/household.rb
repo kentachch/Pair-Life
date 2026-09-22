@@ -1,11 +1,24 @@
 class Household < ApplicationRecord
   MAX_MEMBERS = 2
-  DEFAULT_CATEGORY_NAMES = %w[家賃 水道代 電気代 ガス代 食費 日用品 外食 雑費 交際費 その他].freeze
+
+  DEFAULT_CATEGORIES = {
+    "家賃" => "house",
+    "水道代" => "droplet",
+    "電気代" => "zap",
+    "ガス代" => "flame",
+    "食費" => "shopping-basket",
+    "日用品" => "spray-can",
+    "外食" => "utensils",
+    "雑費" => "shapes",
+    "交際費" => "gift",
+    "その他" => "circle-ellipsis"
+  }.freeze
+
   has_many :household_members, dependent: :destroy
   has_many :users, through: :household_members
   has_many :categories, dependent: :destroy
   has_many :expenses, dependent: :destroy
-  # 世帯・家族・パートナー同士の名前
+
   validates :name, presence: true
 
   # 世帯を作るときに招待コードを自動で発行する
@@ -22,9 +35,7 @@ class Household < ApplicationRecord
       household = create!(name: name)
 
       # 世帯作成時に初期カテゴリを自動で作る
-      DEFAULT_CATEGORY_NAMES.each do |category_name|
-        household.categories.create!(name: category_name)
-      end
+      household.add_default_categories!
       household.household_members.create!(user: user)
       household
     end
@@ -36,6 +47,21 @@ class Household < ApplicationRecord
       household_members.create!(user: user)
       update!(invite_code: nil) if full? # 2人そろったら招待コードを無効にする
     end
+  end
+
+  # 初期カテゴリのうち、まだない物を追加する。何度実行しても同じカテゴリは重複しない
+  # 同じ名前のカテゴリがすでにあり、アイコンが未設定(初期値の "tag")なら、初期カテゴリのアイコンにする
+  def add_default_categories!
+    DEFAULT_CATEGORIES.each do |name, icon|
+      category = categories.find_or_initialize_by(name: name) # 探してなければ作る
+      category.icon = icon if category.new_record? || category.icon == Category::DEFAULT_ICON
+      category.save!
+    end
+  end
+
+  # 指定した月の支出の合計金額
+  def monthly_total(month)
+    expenses.in_month(month).sum(:amount)
   end
 
   # 指定した月のカテゴリ別の支出合計を、金額の大きい順に返す

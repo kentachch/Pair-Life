@@ -6,6 +6,9 @@ class HomeController < ApplicationController
     # 表示する月(今月の1日)。Date.current：今日の日付を取得
     @month = Date.current.beginning_of_month
 
+    # 今月の支出の合計金額
+    @monthly_total = household.monthly_total(@month)
+
     # 最近の支出（支払った人、そのカテゴリーの情報も）5件に絞る
     @recent_expenses = household.expenses.includes(:payer, :category).recent.limit(5)
 

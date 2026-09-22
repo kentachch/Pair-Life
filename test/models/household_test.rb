@@ -93,7 +93,9 @@ class HouseholdTest < ActiveSupport::TestCase
   test "create_with_owner! で初期カテゴリが作られる" do
     household = Household.create_with_owner!(name: "テスト家", user: create_user(email: "owner@example.com"))
 
-    assert_equal Household::DEFAULT_CATEGORY_NAMES.sort, household.categories.pluck(:name).sort
+    assert_equal Household::DEFAULT_CATEGORIES.keys.sort, household.categories.pluck(:name).sort
+    # アイコンも初期カテゴリの設定どおりになる
+    assert_equal "house", household.categories.find_by(name: "家賃").icon
   end
 
   test "category_totals はカテゴリごとの合計を金額の大きい順に返す" do
@@ -114,5 +116,60 @@ class HouseholdTest < ActiveSupport::TestCase
 
   test "category_totals は支出がない月には空の配列を返す" do
     assert_equal [], households(:one).category_totals(Date.new(2026, 8, 1))
+  end
+
+  test "初期カテゴリのアイコンは、すべて選択できるアイコンの候補に含まれている" do
+    Household::DEFAULT_CATEGORIES.each_value do |icon|
+      assert_includes Category::ICONS, icon
+    end
+  end
+
+  test "add_default_categories! は足りない初期カテゴリだけを追加する" do
+    household = households(:one)
+    # フィクスチャで「食費」「家賃」はすでにある
+
+    household.add_default_categories!
+
+    assert_equal Household::DEFAULT_CATEGORIES.size, household.categories.count
+  end
+
+  test "add_default_categories! は何度実行しても重複しない" do
+    household = households(:one)
+    household.add_default_categories!
+
+    assert_no_difference "household.categories.count" do
+      household.add_default_categories!
+    end
+  end
+
+  test "add_default_categories! は、アイコンが未設定の同名カテゴリに初期アイコンを付ける" do
+    household = households(:one)
+    categories(:rent).update!(icon: Category::DEFAULT_ICON)
+
+    household.add_default_categories!
+
+    assert_equal "house", categories(:rent).reload.icon
+  end
+
+  test "add_default_categories! は、自分で選んだアイコンを上書きしない" do
+    household = households(:one)
+    categories(:rent).update!(icon: "piggy-bank")
+
+    household.add_default_categories!
+
+    assert_equal "piggy-bank", categories(:rent).reload.icon
+  end
+
+  test "monthly_total はその月の支出の合計を返す" do
+    household = households(:one)
+    # expenses(:one) で 9/1 に 3000 円が登録済み
+    household.expenses.create!(payer: users(:one), category: categories(:rent), amount: 80000, spent_on: Date.new(2026, 9, 30))
+    household.expenses.create!(payer: users(:one), category: categories(:rent), amount: 999, spent_on: Date.new(2026, 10, 1))
+
+    assert_equal 83000, household.monthly_total(Date.new(2026, 9, 1))
+  end
+
+  test "monthly_total は支出がない月には 0 を返す" do
+    assert_equal 0, households(:one).monthly_total(Date.new(2026, 8, 1))
   end
 end

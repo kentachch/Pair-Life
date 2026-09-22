@@ -2,27 +2,53 @@
 
 <div class="min-h-screen bg-gray-50">
   <main class="mx-auto max-w-3xl px-4 py-12">
+
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-bold text-gray-900">支出一覧</h1>
       <%= link_to "＋ 支出を追加", new_expense_path,
           class: "rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
     </div>
 
-    <div class="mt-8 overflow-hidden rounded-xl bg-white shadow-sm">
+    <!-- 月の切り替えと、その月の合計 -->
+    <div class="mt-8 rounded-xl bg-white p-6 shadow-sm">
+
+      <div class="flex items-center justify-between">
+        <%= link_to "◀ #{@month.prev_month.strftime('%-m月')}",
+            expenses_path(month: @month.prev_month.strftime("%Y-%m")),
+            class: "rounded border px-3 py-1 text-sm text-gray-700 hover:bg-gray-100" %>
+
+        <h2 class="text-lg font-semibold text-gray-900"><%= @month.strftime("%Y年%-m月") %></h2>
+
+        <%= link_to "#{@month.next_month.strftime('%-m月')} ▶",
+            expenses_path(month: @month.next_month.strftime("%Y-%m")),
+            class: "rounded border px-3 py-1 text-sm text-gray-700 hover:bg-gray-100" %>
+      </div>
+
+      <p class="mt-4 text-center text-sm text-gray-500">支出の合計</p>
+      <p class="text-center text-3xl font-bold text-gray-900">
+        <%= number_to_currency(@monthly_total, unit: "¥", precision: 0) %>
+      </p>
+    </div>
+
+    <div class="mt-6 overflow-hidden rounded-xl bg-white shadow-sm">
       <% if @expenses.any? %>
+
         <ul class="divide-y">
           <% @expenses.each do |expense| %>
             <li class="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
-              <div>
-                <p class="font-medium text-gray-900">
-                  <%= expense.category.name %>
-                  <% if expense.memo.present? %>
-                    <span class="text-sm font-normal text-gray-500">・<%= expense.memo %></span>
-                  <% end %>
-                </p>
-                <p class="text-sm text-gray-500">
-                  <%= expense.spent_on.strftime("%Y/%m/%d") %> ・ <%= expense.payer.name %> が支払い
-                </p>
+              <div class="flex items-center gap-4">
+                <%= category_icon(expense.category) %>
+                <div>
+                  <p class="font-medium text-gray-900">
+                    <%= expense.category.name %>
+                    <% if expense.memo.present? %>
+                      <span class="text-sm font-normal text-gray-500">（<%= expense.memo %>）</span>
+                    <% end %>
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    <%= expense.spent_on.strftime("%Y/%m/%d") %> ・ <%= expense.payer.name %> が支払い
+                  </p>
+                </div>
               </div>
 
               <div class="flex items-center gap-3">
@@ -39,7 +65,7 @@
           <% end %>
         </ul>
       <% else %>
-        <p class="px-6 py-8 text-center text-sm text-gray-500">まだ支出が登録されていません。</p>
+        <p class="px-6 py-8 text-center text-sm text-gray-500"><%= @month.strftime("%-m月") %>の支出はまだありません。</p>
       <% end %>
     </div>
 
