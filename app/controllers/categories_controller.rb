@@ -3,7 +3,10 @@ class CategoriesController < ApplicationController
   before_action :set_category, only: [ :edit, :update, :destroy ]
 
   def index
+    # カテゴリー名
     @categories = current_user.household.categories.order(:created_at)
+    # カテゴリごとの支出の件数 → { カテゴリのID => 件数 }。支出があるカテゴリは削除できないことを画面に示す
+    @expense_counts = current_user.household.expenses.group(:category_id).count
   end
 
   def new
@@ -48,6 +51,6 @@ class CategoriesController < ApplicationController
   end
 
   def category_params
-    params.require(:category).permit(:name)
+    params.require(:category).permit(:name, :icon)
   end
 end

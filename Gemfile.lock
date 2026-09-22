@@ -168,6 +168,8 @@ GEM
     loofah (2.25.2)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
+    lucide-rails (0.7.4)
+      railties (>= 4.1.0)
     mail (2.9.1)
       logger
       mini_mime (>= 0.1.1)
@@ -421,6 +423,7 @@ DEPENDENCIES
   jbuilder
   json (~> 2.0)
   kamal
+  lucide-rails (~> 0.7.4)
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)
