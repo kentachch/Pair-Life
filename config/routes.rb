@@ -9,6 +9,10 @@ Rails.application.routes.draw do
     put   "users",         to: "devise/registrations#update"
   end
 
+  # 死活監視用の URL。アプリが正常に起動していれば 200 を返す
+  # Render のヘルスチェック(render.yaml の healthCheckPath)が、この URL にアクセスする
+  get "up" => "rails/health#show", as: :rails_health_check
+
   root "home#index"
   resource :household, only: [ :new, :create, :show ]
   resource :invitation, only: [ :new, :create ]
