@@ -137,7 +137,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
       assert_select "a[href=?]", expenses_path, text: /支出/
       assert_select "a[href=?]", new_expense_path, text: /追加/
       assert_select "a[href=?]", categories_path, text: /カテゴリ/
-      assert_select "a[href=?]", household_path, text: /世帯/
+      assert_select "a[href=?]", settlements_path, text: /精算/
     end
   end
 
@@ -150,12 +150,14 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "nav.fixed a.text-blue-600", count: 1
   end
 
-  test "ヘッダーにスマホ用のメニュー(アカウント編集・ログアウト)がある" do
+  test "ヘッダーにスマホ用のメニュー(世帯メンバー・アカウント編集・ログアウト)がある" do
     sign_in users(:one)
 
     get root_url
 
     assert_select "header details" do
+      # 世帯ページは下部タブバーから外したので、メニューから開く
+      assert_select "a[href=?]", household_path, text: /世帯メンバー/
       assert_select "a[href=?]", edit_user_registration_path
       assert_select "form[action=?]", destroy_user_session_path
     end

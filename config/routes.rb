@@ -10,10 +10,11 @@ Rails.application.routes.draw do
   end
 
   root "home#index"
-  resource :household, only: [ :new, :create, :show ] # 世帯の作成・表示
-  resource :invitation, only: [ :new, :create ]        # 招待コードでの参加
-  resources :categories, except: [ :show ] # カテゴリの作成・編集・削除
-  resources :expenses, except: [ :show ]   # 支出の作成・編集・削除
+  resource :household, only: [ :new, :create, :show ]
+  resource :invitation, only: [ :new, :create ]
+  resources :categories, except: [ :show ]
+  resources :expenses, except: [ :show ]
+  resources :settlements, only: [ :index, :create ]
 
   # JSON を返す API は、画面用の URL と区別するため /api の下にまとめる
   namespace :api do

@@ -1,16 +1,19 @@
 class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
-
-  # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
-  # ログインしていないユーザーはログイン画面へ移動させる
   before_action :authenticate_user!
-  # Devise の画面を表示するときだけ、受け取れる項目に name を追加する
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   private
+
+  # ?month=2026-09 を日付(その月の1日)に変換する。指定がない・形式が正しくないときは default を返す
+  # 支出一覧と精算画面で使う
+  def selected_month(default: Date.current.beginning_of_month)
+    Date.strptime(params[:month].to_s, "%Y-%m")
+  rescue Date::Error
+    default
+  end
 
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [ :name ])          # 新規登録
