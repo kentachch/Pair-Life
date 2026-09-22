@@ -83,26 +83,6 @@
       </div>
     <% end %>
 
-    <!-- アカウント削除 -->
-    <div class="mt-8 border-t border-gray-200 pt-6">
-      <h3 class="mb-2 text-lg font-semibold text-gray-900">
-        アカウントの削除
-      </h3>
-
-      <p class="mb-4 text-sm text-gray-500">
-        アカウントを削除すると、元に戻すことはできません。
-      </p>
-
-      <%= button_to "アカウントを削除",
-          registration_path(resource_name),
-          data: {
-            confirm: "本当にアカウントを削除しますか？",
-            turbo_confirm: "本当にアカウントを削除しますか？"
-          },
-          method: :delete,
-          class: "w-full rounded-lg border border-red-300 bg-white px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" %>
-    </div>
-
     <!-- 戻る -->
     <div class="mt-6 text-center">
       <%= link_to "戻る",
