@@ -210,4 +210,22 @@ class HouseholdTest < ActiveSupport::TestCase
   test "payer_totals は他の世帯のメンバーを含まない" do
     assert_not_includes households(:one).payer_totals(Date.new(2026, 9, 1)).keys, users(:two)
   end
+
+  test "settled? は精算済みの月なら true を返す" do
+    # settlements(:two_august) で households(:two) の 2026年8月は精算済み
+    assert households(:two).settled?(Date.new(2026, 8, 1))
+  end
+
+  test "settled? は月の途中の日付を渡しても判定できる" do
+    assert households(:two).settled?(Date.new(2026, 8, 20))
+  end
+
+  test "settled? は精算していない月なら false を返す" do
+    assert_not households(:two).settled?(Date.new(2026, 9, 1))
+  end
+
+  test "settled? は他の世帯の精算を見ない" do
+    # households(:two) の8月は精算済みだが、households(:one) の8月は未精算
+    assert_not households(:one).settled?(Date.new(2026, 8, 1))
+  end
 end
