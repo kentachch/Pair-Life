@@ -12,15 +12,15 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in users(:one)
 
     get root_url
-    assert_select "header a[href=?]", categories_path, text: "カテゴリ"
+    assert_select "header a[href=?]", categories_path, text: "カテゴリを作る"
   end
 
   test "ヘッダーに世帯ページへのリンクがある" do
-  sign_in users(:one)
+    sign_in users(:one)
 
-  get root_url
-  assert_select "header a[href=?]", household_path, text: "世帯"
-end
+    get root_url
+    assert_select "header a[href=?]", household_path, text: "世帯メンバー"
+  end
 
 
   test "ログインしていなければログイン画面へ移動する" do
