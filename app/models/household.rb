@@ -89,7 +89,7 @@ class Household < ApplicationRecord
 
   # 指定した月が精算済みかどうか。その月の settlements レコードがあれば精算済み
   def settled?(month)
-    settlements.exits?(target_month: month.beginning_of_month)
+    settlements.exists?(target_month: month.beginning_of_month)
   end
 
   private
