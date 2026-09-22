@@ -236,4 +236,17 @@ class ExpensesControllerTest < ActionDispatch::IntegrationTest
 
     assert_no_match "パートナーはまだ参加していません", response.body
   end
+
+  test "一覧の編集・削除ボタンは、スマホでも押しやすいアイコンボタンになっている" do
+    get expenses_url(month: "2026-09")
+
+    assert_select "a[href=?][aria-label='編集']", edit_expense_path(expenses(:one))
+    assert_select "form[action=?] button[aria-label='削除']", expense_path(expenses(:one))
+  end
+
+  test "下部タブバーでは、支出の画面にいるとき支出タブが強調される" do
+    get expenses_url(month: "2026-09")
+
+    assert_select "nav.fixed a.text-blue-600[href=?]", expenses_path
+  end
 end

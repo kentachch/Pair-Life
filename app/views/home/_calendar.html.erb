@@ -1,5 +1,5 @@
 <%# 今月のカレンダー。支出があった日には、その日の合計金額を表示する %>
-<div class="rounded-xl bg-white p-6 shadow-sm">
+<div class="rounded-xl bg-white p-4 shadow-sm sm:p-6">
   <h3 class="font-semibold text-gray-900"><%= month.strftime("%Y年%-m月") %></h3>
 
   <table class="mt-4 w-full table-fixed text-center text-sm">
@@ -17,12 +17,14 @@
       <%# calendar_weeksには月〜日までの曜日の配列が格納されている %>
         <tr>
           <% week.each do |date| %>
-            <td class="h-14 align-top <%= date.month == month.month ? 'text-gray-900' : 'text-gray-300' %>">
+            <td class="h-12 align-top sm:h-14 <%= date.month == month.month ? 'text-gray-900' : 'text-gray-300' %>">
               <div class="<%= 'font-bold text-blue-600' if date == Date.current %>"><%= date.day %></div>
 
               <% if daily_totals[date] %>
                 <%# dateにはその日の日付が格納されている %>
-                <div class="mx-auto mt-1 truncate rounded bg-blue-50 px-0.5 text-xs text-blue-700">
+                <%# スマホでは金額が入りきらないので「●」だけ、sm 以上では金額を表示する %>
+                <div class="mt-1 text-[10px] leading-none text-blue-600 sm:hidden" aria-hidden="true">●</div>
+                <div class="mx-auto mt-1 hidden truncate rounded bg-blue-50 px-0.5 text-xs text-blue-700 sm:block">
                   <%= number_to_currency(daily_totals[date], unit: "¥", precision: 0) %>
                 </div>
               <% end %>

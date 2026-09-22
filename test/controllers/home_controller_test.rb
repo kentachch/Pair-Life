@@ -69,7 +69,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "h3", text: "2026年9月"
     # 9/1 は expenses(:one) の 3000 円 + 500 円
-    assert_select "td", text: /1\s*¥3,500/
+    # スマホ用の「●」と、sm 以上で表示する金額の両方が出力される
+    assert_select "td", text: /1\s*●\s*¥3,500/
   end
 
   test "円グラフ用に今月のAPIのURLが埋め込まれている" do
@@ -122,5 +123,47 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     # expenses(:one) で users(:one) が 3000 円
     assert_select "li", text: /ユーザー1.*¥3,000/m
     assert_select "li", text: /パートナー.*¥80,000/m
+  end
+
+  # --- スマホ対応 ---
+
+  test "ログイン中はスマホ用の下部タブバーが表示される" do
+    sign_in users(:one)
+
+    get root_url
+
+    assert_select "nav.fixed" do
+      assert_select "a[href=?]", root_path, text: /ホーム/
+      assert_select "a[href=?]", expenses_path, text: /支出/
+      assert_select "a[href=?]", new_expense_path, text: /追加/
+      assert_select "a[href=?]", categories_path, text: /カテゴリ/
+      assert_select "a[href=?]", household_path, text: /世帯/
+    end
+  end
+
+  test "下部タブバーでは、今いる画面のタブが強調される" do
+    sign_in users(:one)
+
+    get root_url
+
+    assert_select "nav.fixed a.text-blue-600[href=?]", root_path
+    assert_select "nav.fixed a.text-blue-600", count: 1
+  end
+
+  test "ヘッダーにスマホ用のメニュー(アカウント編集・ログアウト)がある" do
+    sign_in users(:one)
+
+    get root_url
+
+    assert_select "header details" do
+      assert_select "a[href=?]", edit_user_registration_path
+      assert_select "form[action=?]", destroy_user_session_path
+    end
+  end
+
+  test "ログインしていなければ下部タブバーは表示されない" do
+    get new_user_session_url
+
+    assert_select "nav.fixed", count: 0
   end
 end

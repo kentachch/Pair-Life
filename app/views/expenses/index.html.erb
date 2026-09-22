@@ -1,7 +1,7 @@
 <% content_for(:title) { "支出一覧" } %>
 
 <div class="min-h-screen bg-gray-50">
-  <main class="mx-auto max-w-3xl px-4 py-12">
+  <main class="mx-auto max-w-3xl px-4 py-6 sm:py-12">
 
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-bold text-gray-900">支出一覧</h1>
@@ -10,18 +10,18 @@
     </div>
 
     <!-- 月の切り替えと、その月の合計 -->
-    <div class="mt-8 rounded-xl bg-white p-6 shadow-sm">
+    <div class="mt-6 rounded-xl bg-white p-4 shadow-sm sm:mt-8 sm:p-6">
 
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between gap-2">
         <%= link_to "◀ #{@month.prev_month.strftime('%-m月')}",
             expenses_path(month: @month.prev_month.strftime("%Y-%m")),
-            class: "rounded border px-3 py-1 text-sm text-gray-700 hover:bg-gray-100" %>
+            class: "rounded-lg border px-3 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
 
         <h2 class="text-lg font-semibold text-gray-900"><%= @month.strftime("%Y年%-m月") %></h2>
 
         <%= link_to "#{@month.next_month.strftime('%-m月')} ▶",
             expenses_path(month: @month.next_month.strftime("%Y-%m")),
-            class: "rounded border px-3 py-1 text-sm text-gray-700 hover:bg-gray-100" %>
+            class: "rounded-lg border px-3 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
       </div>
 
       <p class="mt-4 text-center text-sm text-gray-500">支出の合計</p>
@@ -39,31 +39,39 @@
 
         <ul class="divide-y">
           <% @expenses.each do |expense| %>
-            <li class="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
-              <div class="flex items-center gap-4">
-                <%= category_icon(expense.category) %>
-                <div>
-                  <p class="font-medium text-gray-900">
-                    <%= expense.category.name %>
-                    <% if expense.memo.present? %>
-                      <span class="text-sm font-normal text-gray-500">（<%= expense.memo %>）</span>
-                    <% end %>
-                  </p>
-                  <p class="text-sm text-gray-500">
-                    <%= expense.spent_on.strftime("%Y/%m/%d") %> ・ <%= expense.payer.name %> が支払い
-                  </p>
-                </div>
+            <%# スマホでも1行に収まるよう、左に内容・右に金額と操作ボタンを置く %>
+            <li class="flex items-center gap-3 px-4 py-4 sm:px-6">
+              <%= category_icon(expense.category) %>
+
+              <%# min-w-0 と truncate で、長いメモは「…」で省略して横にはみ出さないようにする %>
+              <div class="min-w-0 flex-1">
+                <p class="truncate font-medium text-gray-900">
+                  <%= expense.category.name %>
+                  <% if expense.memo.present? %>
+                    <span class="text-sm font-normal text-gray-500">（<%= expense.memo %>）</span>
+                  <% end %>
+                </p>
+                <p class="truncate text-sm text-gray-500">
+                  <%= expense.spent_on.strftime("%-m/%-d") %> ・ <%= expense.payer.name %>
+                </p>
               </div>
 
-              <div class="flex items-center gap-3">
+              <div class="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">
                 <p class="font-semibold text-gray-900">
                   <%= number_to_currency(expense.amount, unit: "¥", precision: 0) %>
                 </p>
-                <%= link_to "編集", edit_expense_path(expense),
-                    class: "rounded border px-3 py-1 text-sm hover:bg-gray-100" %>
-                <%= button_to "削除", expense_path(expense), method: :delete,
-                    form: { data: { turbo_confirm: "この支出を削除しますか？" } },
-                    class: "rounded border border-red-200 px-3 py-1 text-sm text-red-600 hover:bg-red-50" %>
+                <%# 操作ボタンはアイコンにして、指で押しやすい大きさ(36px)にする %>
+                <div class="flex gap-1">
+                  <%= link_to edit_expense_path(expense), title: "編集", "aria-label": "編集",
+                      class: "flex h-9 w-9 items-center justify-center rounded-lg border text-gray-600 hover:bg-gray-100" do %>
+                    <%= lucide_icon("pencil", size: 16) %>
+                  <% end %>
+                  <%= button_to expense_path(expense), method: :delete, title: "削除", "aria-label": "削除",
+                      form: { data: { turbo_confirm: "この支出を削除しますか？" } },
+                      class: "flex h-9 w-9 items-center justify-center rounded-lg border border-red-200 text-red-600 hover:bg-red-50" do %>
+                    <%= lucide_icon("trash-2", size: 16) %>
+                  <% end %>
+                </div>
               </div>
             </li>
           <% end %>

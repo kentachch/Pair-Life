@@ -1,8 +1,8 @@
 <div class="min-h-screen bg-gray-50">
-  <main class="mx-auto max-w-6xl px-4 py-8">
+  <main class="mx-auto max-w-6xl px-4 py-6 sm:py-8">
 
     <!-- ページタイトル -->
-    <div class="mb-8 flex items-center justify-between">
+    <div class="mb-6 flex items-center justify-between sm:mb-8">
       <div>
         <h2 class="text-2xl font-bold text-gray-900">
           家計一覧
@@ -12,13 +12,14 @@
         </p>
       </div>
 
+      <%# スマホでは下部タブバーの「追加」を使うので、このボタンは sm 以上でだけ表示する %>
       <%= link_to "＋ 支出を追加",
           new_expense_path,
-          class: "rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
+          class: "hidden rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 sm:inline-block" %>
     </div>
 
     <!-- 今月の支出合計と、支払った人の内訳。広い画面では左右に、スマホでは上下に並べる -->
-    <div class="mb-8 grid gap-6 rounded-xl bg-white p-6 shadow-sm md:grid-cols-2 md:gap-10">
+    <div class="mb-6 grid gap-6 rounded-xl bg-white p-4 shadow-sm sm:mb-8 sm:p-6 md:grid-cols-2 md:gap-10">
       <div class="flex flex-col justify-between gap-4">
         <div>
           <p class="text-sm font-medium text-gray-500"><%= @month.strftime("%-m月") %>の支出合計</p>
@@ -36,11 +37,11 @@
     </div>
 
     <!-- カレンダーと円グラフ。広い画面では2列、スマホでは1列に並べる -->
-    <div class="mb-8 grid gap-6 lg:grid-cols-2">
+    <div class="mb-6 grid gap-6 sm:mb-8 lg:grid-cols-2">
       <%= render "calendar", month: @month, daily_totals: @daily_totals %>
 
       <!-- 円グラフ。データは JavaScript(category_chart_controller.js)が API から取得して描く -->
-      <div class="rounded-xl bg-white p-6 shadow-sm"
+      <div class="rounded-xl bg-white p-4 shadow-sm sm:p-6"
         data-controller="category-chart"
         data-category-chart-url-value="<%= api_category_totals_path(month: @month.strftime('%Y-%m')) %>">
 
@@ -60,7 +61,7 @@
     <!-- 最近の支出 -->
     <div class="overflow-hidden rounded-xl bg-white shadow-sm">
 
-      <div class="flex items-center justify-between border-b px-6 py-4">
+      <div class="flex items-center justify-between border-b px-4 py-4 sm:px-6">
         <h3 class="font-semibold text-gray-900">最近の支出</h3>
         <%= link_to "すべて見る", expenses_path, class: "text-sm font-semibold text-blue-600 hover:underline" %>
       </div>
@@ -69,8 +70,8 @@
 
         <div class="divide-y">
           <% @recent_expenses.each do |expense| %>
-            <div class="flex items-center justify-between px-6 py-5">
-              <div class="flex items-center gap-4">
+            <div class="flex items-center justify-between gap-3 px-4 py-4 sm:px-6 sm:py-5">
+              <div class="flex min-w-0 items-center gap-3 sm:gap-4">
                 <%= category_icon(expense.category) %>
                 <div>
                   <p class="font-medium text-gray-900">
@@ -95,7 +96,7 @@
 
       <% else %>
 
-        <p class="px-6 py-8 text-center text-sm text-gray-500">
+        <p class="px-4 py-8 text-center text-sm text-gray-500 sm:px-6">
           まだ支出が登録されていません。
         </p>
 

@@ -1,0 +1,20 @@
+<%# スマホ用の下部タブバー(PC では md:hidden で隠す)。よく使う画面へ親指で移動できるようにする %>
+<nav class="fixed inset-x-0 bottom-0 z-20 border-t bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
+  <ul class="mx-auto grid max-w-md grid-cols-5">
+    <% [
+         [ "ホーム", root_path, "house", %w[home] ],
+         [ "支出", expenses_path, "receipt", %w[expenses] ],
+         [ "追加", new_expense_path, "circle-plus", [] ],
+         [ "カテゴリ", categories_path, "tags", %w[categories] ],
+         [ "世帯", household_path, "users", %w[households invitations] ]
+       ].each do |label, path, icon, controllers| %>
+      <li>
+        <%# 今いる画面のタブは青くする %>
+        <%= link_to path, class: "flex flex-col items-center gap-0.5 py-2 text-xs #{nav_active?(*controllers) ? 'text-blue-600' : 'text-gray-500'}" do %>
+          <%= lucide_icon(icon, size: 22) %>
+          <span><%= label %></span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</nav>

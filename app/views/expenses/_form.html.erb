@@ -5,7 +5,8 @@
   <div class="space-y-4">
     <div>
       <%= f.label :amount, "金額(円)", class: "block text-sm font-medium text-gray-700" %>
-      <%= f.number_field :amount, min: 1, step: 1, placeholder: "例：3000",
+      <%# inputmode: "numeric" で、スマホでは数字のキーボードが表示される %>
+      <%= f.number_field :amount, min: 1, step: 1, inputmode: "numeric", placeholder: "例：3000",
           class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
     </div>
 
