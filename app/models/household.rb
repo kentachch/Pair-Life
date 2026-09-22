@@ -38,6 +38,16 @@ class Household < ApplicationRecord
     end
   end
 
+  # 指定した月のカテゴリ別の支出合計を、金額の大きい順に返す
+  # 例：[["家賃", 80000], ["食費", 45800], ["日用品", 3200]]
+  def category_totals(month)
+    expenses.in_month(month)
+            .joins(:category)             # 支出テーブルにカテゴリテーブルをつなげる
+            .group("categories.name")     # テーブル名は複数形の categories
+            .sum(:amount)
+            .sort_by { |_name, amount| -amount } # マイナスを付けると大きい順になる
+  end
+
   private
 
   def generate_invite_code
