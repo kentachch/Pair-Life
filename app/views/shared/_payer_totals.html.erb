@@ -1,0 +1,51 @@
+<%# メンバーごとの支払い合計。payer_totals は { User => 金額 } のハッシュ %>
+<% total = payer_totals.values.sum %>
+<%# メンバーごとの色(世帯は最大2人)。1人目は青、2人目は緑 %>
+<% colors = %w[bg-blue-500 bg-emerald-500] %>
+
+<div>
+  <p class="text-sm font-medium text-gray-500">支払った人の内訳</p>
+
+  <%# 2人の支払いの割合を、1本の横棒で表す。支出がない月は灰色の棒だけになる %>
+  <div class="mt-3 flex h-2.5 overflow-hidden rounded-full bg-gray-100">
+    <% payer_totals.each_with_index do |(user, amount), index| %>
+      <% next if amount.zero? %>
+      <div class="<%= colors[index] %>" style="width: <%= share_percent(amount, total) %>%"
+           title="<%= user.name %> <%= share_percent(amount, total) %>%"></div>
+    <% end %>
+  </div>
+
+  <ul class="mt-4 space-y-3">
+    <% payer_totals.each_with_index do |(user, amount), index| %>
+      <li class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <%# 名前の1文字目を、メンバーの色の丸で表示する %>
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white <%= colors[index] %>">
+            <%= user.name.first %>
+          </span>
+          <div>
+            <p class="text-sm font-medium text-gray-900">
+              <%= user.name %>
+              <% if user == current_user %>
+                <span class="text-xs font-normal text-gray-400">(あなた)</span>
+              <% end %>
+            </p>
+            <p class="text-xs text-gray-500"><%= share_percent(amount, total) %>%</p>
+          </div>
+        </div>
+
+        <p class="text-lg font-semibold text-gray-900">
+          <%= number_to_currency(amount, unit: "¥", precision: 0) %>
+        </p>
+      </li>
+    <% end %>
+  </ul>
+
+  <%# パートナーがまだ参加していないときは、招待コードを確認できる世帯ページへ案内する %>
+  <% if payer_totals.size < Household::MAX_MEMBERS %>
+    <p class="mt-4 rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-500">
+      パートナーはまだ参加していません。
+      <%= link_to "招待コードを確認", household_path, class: "font-semibold text-blue-600 hover:underline" %>
+    </p>
+  <% end %>
+</div>

@@ -195,4 +195,45 @@ class ExpensesControllerTest < ActionDispatch::IntegrationTest
     get expenses_url
     assert_redirected_to new_user_session_url
   end
+
+  # --- 支払った人の内訳 ---
+
+  test "支払った人ごとの合計と割合が表示される" do
+    partner = create_user(email: "partner@example.com", name: "パートナー")
+    households(:one).add_member!(partner)
+    # expenses(:one) で users(:one) が 3000 円。パートナーが 1000 円払うと 75% : 25%
+    households(:one).expenses.create!(payer: partner, category: categories(:rent), amount: 1000, spent_on: Date.new(2026, 9, 10))
+
+    get expenses_url(month: "2026-09")
+
+    assert_select "li", text: /ユーザー1.*\(あなた\).*75%.*¥3,000/m
+    assert_select "li", text: /パートナー.*25%.*¥1,000/m
+    # 割合の横棒
+    assert_select "div[style='width: 75%']"
+    assert_select "div[style='width: 25%']"
+  end
+
+  test "支払いがないメンバーは ¥0 と表示される" do
+    partner = create_user(email: "partner@example.com", name: "パートナー")
+    households(:one).add_member!(partner)
+
+    get expenses_url(month: "2026-09")
+
+    assert_select "li", text: /パートナー.*0%.*¥0/m
+  end
+
+  test "パートナーが未参加なら、招待コードの確認へ案内する" do
+    get expenses_url(month: "2026-09")
+
+    assert_match "パートナーはまだ参加していません", response.body
+    assert_select "a[href=?]", household_path, text: "招待コードを確認"
+  end
+
+  test "2人そろっていれば、未参加の案内は出ない" do
+    households(:one).add_member!(create_user(email: "partner@example.com"))
+
+    get expenses_url(month: "2026-09")
+
+    assert_no_match "パートナーはまだ参加していません", response.body
+  end
 end

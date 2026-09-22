@@ -9,4 +9,12 @@ module ApplicationHelper
       lucide_icon(category.icon, size: icon_size, "aria-hidden": true)
     end
   end
+
+  # 合計に対する割合(%)を整数で返す。合計が 0 のときは 0
+  # 例：share_percent(120000, 200000) → 60
+  def share_percent(amount, total)
+    return 0 if total.zero?
+
+    (amount * 100.0 / total).round
+  end
 end

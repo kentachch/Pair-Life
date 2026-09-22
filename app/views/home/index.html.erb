@@ -17,16 +17,22 @@
           class: "rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
     </div>
 
-    <!-- 今月の支出合計 -->
-    <div class="mb-8 flex items-center justify-between rounded-xl bg-white p-6 shadow-sm">
-      <div>
-        <p class="text-sm font-medium text-gray-500"><%= @month.strftime("%-m月") %>の支出合計</p>
-        <p class="mt-1 text-3xl font-bold text-gray-900">
-          <%= number_to_currency(@monthly_total, unit: "¥", precision: 0) %>
-        </p>
+    <!-- 今月の支出合計と、支払った人の内訳。広い画面では左右に、スマホでは上下に並べる -->
+    <div class="mb-8 grid gap-6 rounded-xl bg-white p-6 shadow-sm md:grid-cols-2 md:gap-10">
+      <div class="flex flex-col justify-between gap-4">
+        <div>
+          <p class="text-sm font-medium text-gray-500"><%= @month.strftime("%-m月") %>の支出合計</p>
+          <p class="mt-1 text-4xl font-bold text-gray-900">
+            <%= number_to_currency(@monthly_total, unit: "¥", precision: 0) %>
+          </p>
+        </div>
+        <%= link_to "明細を見る →", expenses_path(month: @month.strftime("%Y-%m")),
+            class: "text-sm font-semibold text-blue-600 hover:underline" %>
       </div>
-      <%= link_to "明細を見る", expenses_path(month: @month.strftime("%Y-%m")),
-          class: "text-sm font-semibold text-blue-600 hover:underline" %>
+
+      <div class="border-t pt-6 md:border-t-0 md:border-l md:pl-10 md:pt-0">
+        <%= render "shared/payer_totals", payer_totals: @payer_totals %>
+      </div>
     </div>
 
     <!-- カレンダーと円グラフ。広い画面では2列、スマホでは1列に並べる -->
@@ -71,7 +77,7 @@
                     <%= expense.category.name %>
                   </p>
                   <p class="text-sm text-gray-500">
-                    <%= expense.spent_on.strftime("%Y/%m/%d") %> ・ <%= expense.payer.name %>
+                    <%= expense.spent_on.strftime("%Y/%m/%d") %> 支払い：👤 <%= expense.payer.name %>
                   </p>
                 </div>
               </div>
