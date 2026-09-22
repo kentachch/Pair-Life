@@ -12,5 +12,5 @@ test:
   <<: *default
 
 production:
-  database: cache
+  # 本番のキャッシュは Solid Cache ではなくメモリ(production.rb の cache_store)を使うので、専用の DB は指定しない
   <<: *default

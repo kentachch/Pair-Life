@@ -86,20 +86,11 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  primary: &primary_production
-    <<: *default
-    database: app_production
-    username: app
-    password: <%= ENV["APP_DATABASE_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: app_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: app_production_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *primary_production
-    database: app_production_cable
-    migrations_paths: db/cable_migrate
+  # 本番は Neon の PostgreSQL を1つだけ使う。接続先は Render の環境変数 DATABASE_URL で設定する
+  # (Rails 8 の初期設定ではキャッシュ・ジョブ・Action Cable 用に DB を4つ使うが、このアプリでは使わない)
+  # default の host・username・password(開発用の値)は引き継がず、DATABASE_URL だけを使う
+  primary:
+    adapter: postgresql
+    encoding: unicode
+    max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    url: <%= ENV["DATABASE_URL"] %>
