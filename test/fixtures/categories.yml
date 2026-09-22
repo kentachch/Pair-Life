@@ -1,14 +1,18 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 # 同じ世帯の中では name が重複できないため、生成時の MyString から実際の値に変えている
+# icon は Lucide のアイコン名(Category::ICONS のどれか)
 
 food:
   household: one
   name: 食費
+  icon: shopping-basket
 
 rent:
   household: one
   name: 家賃
+  icon: house
 
 other_household_food:
   household: two
   name: 食費
+  icon: shopping-basket

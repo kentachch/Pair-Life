@@ -119,4 +119,40 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
     get categories_url
     assert_redirected_to new_user_session_url
   end
+
+  test "一覧ではカテゴリごとにアイコンと支出の件数が表示される" do
+    get categories_url
+
+    # category_icon ヘルパーは <span data-icon="アイコン名"><svg>...</svg></span> を出力する
+    assert_select "[data-icon=shopping-basket] svg"
+    assert_select "[data-icon=house] svg"
+    # categories(:food) には expenses(:one) の1件がある
+    assert_match "支出 1 件", response.body
+  end
+
+  test "支出があるカテゴリには削除ボタンを表示しない" do
+    get categories_url
+
+    # 支出のない「家賃」だけ削除ボタンがある
+    assert_select "form[action=?]", category_path(categories(:rent))
+    assert_select "form[action=?]", category_path(categories(:food)), count: 0
+  end
+
+  test "アイコンを選んでカテゴリを追加できる" do
+    post categories_url, params: { category: { name: "ペット", icon: "dog" } }
+
+    assert_equal "dog", households(:one).categories.find_by(name: "ペット").icon
+  end
+
+  test "追加画面では初期値の tag アイコンが選ばれている" do
+    get new_category_url
+
+    assert_select "input[type=radio][name='category[icon]'][value=tag][checked]"
+  end
+
+  test "カテゴリのアイコンを変更できる" do
+    patch category_url(categories(:food)), params: { category: { icon: "utensils" } }
+
+    assert_equal "utensils", categories(:food).reload.icon
+  end
 end

@@ -74,4 +74,28 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-controller='category-chart'][data-category-chart-url-value=?]",
                   api_category_totals_path(month: "2026-09")
   end
+
+  test "今月の支出合計が表示される" do
+    sign_in users(:one)
+
+    travel_to Date.new(2026, 9, 22) do
+      households(:one).expenses.create!(payer: users(:one), category: categories(:rent), amount: 80000, spent_on: Date.new(2026, 9, 25))
+      # 先月の支出は合計に含まれない
+      households(:one).expenses.create!(payer: users(:one), category: categories(:rent), amount: 999, spent_on: Date.new(2026, 8, 31))
+
+      get root_url
+    end
+
+    assert_match "9月の支出合計", response.body
+    # expenses(:one) の 3000 円 + 80000 円
+    assert_match "¥83,000", response.body
+  end
+
+  test "最近の支出にはカテゴリのアイコンが表示される" do
+    sign_in users(:one)
+
+    get root_url
+
+    assert_select "[data-icon=shopping-basket] svg"
+  end
 end

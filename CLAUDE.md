@@ -100,6 +100,8 @@ docker compose exec web bin/rails db:migrate
 - 世帯作成時に「家賃 / 水道代 / 電気代 / ガス代 / 食費 / 日用品 / 外食 / 雑費 / 交際費 / その他」を自動作成する
 - 初期カテゴリも含め、追加・名前の変更・削除ができる
 - 支出が登録されているカテゴリは削除できない(`dependent: :restrict_with_error`)
+- 各カテゴリは [Lucide](https://lucide.dev/icons) のアイコン名を `icon` に持つ(`lucide-rails` の `lucide_icon` で表示)。選べるアイコンは `Category::ICONS`、未選択時は `tag`
+- 既存の世帯に足りない初期カテゴリは `bin/rails categories:add_defaults` で追加できる
 
 ### 精算(Settlement)
 

@@ -1,20 +1,25 @@
+<%# new と edit で共用するフォーム。category が新規か既存かで送信先が自動で切り替わる %>
 <%= form_with model: category do |f| %>
-
-  <% if category.errors.any? %>
-    <div class="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-700">
-      <ul class="list-inside list-disc">
-        <% category.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "shared/error_messages", object: category %>
 
   <div>
     <%= f.label :name, "カテゴリ名", class: "block text-sm font-medium text-gray-700" %>
     <%= f.text_field :name, placeholder: "例：食費",
         class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
   </div>
+
+  <fieldset class="mt-6">
+    <legend class="block text-sm font-medium text-gray-700">アイコン</legend>
+    <%# ラジオボタン自体は隠し(sr-only)、選ばれたアイコンを青い枠で囲んで表示する(has-checked:) %>
+    <div class="mt-2 grid grid-cols-6 gap-2">
+      <% Category::ICONS.each do |icon| %>  
+        <label class="flex h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 has-checked:border-blue-600 has-checked:bg-blue-50 has-checked:text-blue-600">
+          <%= f.radio_button :icon, icon, class: "sr-only" %>
+          <%= lucide_icon(icon, size: 20, "aria-label": icon) %>
+        </label>
+      <% end %>
+    </div>
+  </fieldset>
 
   <%= f.submit "保存する",
       class: "mt-6 w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
