@@ -6,8 +6,8 @@ class ExpensesController < ApplicationController
     household = current_user.household
     # 表示する月(?month=2026-09 のように指定。指定がなければ今月)
     @month = selected_month
-
-    @payer_totals_amount = household.payer_total(@month)
+    # メンバーごとの支払い合計 → { User => 金額 }
+    @payer_totals = household.payer_totals(@month)
 
     # 表示中の月の支出だけを、日付の新しい順に並べる
     @expenses = household.expenses

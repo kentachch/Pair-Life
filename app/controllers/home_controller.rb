@@ -9,7 +9,8 @@ class HomeController < ApplicationController
     # 今月の支出の合計金額
     @monthly_total = household.monthly_total(@month)
 
-    @@payer_totals_amount = household.payer_totals(@month)
+    # 今月のメンバーごとの支払い合計 → { User => 金額 }
+    @payer_totals = household.payer_totals(@month)
 
     # 最近の支出（支払った人、そのカテゴリーの情報も）5件に絞る
     @recent_expenses = household.expenses.includes(:payer, :category).recent.limit(5)

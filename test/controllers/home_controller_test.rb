@@ -106,4 +106,21 @@ end
 
     assert_select "[data-icon=shopping-basket] svg"
   end
+
+  test "今月の支払った人の内訳が表示される" do
+    sign_in users(:one)
+    partner = create_user(email: "partner@example.com", name: "パートナー")
+    households(:one).add_member!(partner)
+
+    travel_to Date.new(2026, 9, 22) do
+      households(:one).expenses.create!(payer: partner, category: categories(:rent), amount: 80000, spent_on: Date.new(2026, 9, 25))
+
+      get root_url
+    end
+
+    assert_match "支払った人の内訳", response.body
+    # expenses(:one) で users(:one) が 3000 円
+    assert_select "li", text: /ユーザー1.*¥3,000/m
+    assert_select "li", text: /パートナー.*¥80,000/m
+  end
 end

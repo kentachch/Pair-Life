@@ -64,13 +64,15 @@ class Household < ApplicationRecord
     expenses.in_month(month).sum(:amount)
   end
 
-  def payer_total(month)
-    # 支払った人(payer_id)ごとの合計
+  # 指定した月に、メンバーそれぞれが支払った合計金額
+  # 例：{ ユーザー1 => 120000, ユーザー2 => 80000 }
+  def payer_totals(month)
+    # 支払った人(payer_id)ごとの合計 → { 1 => 120000, 2 => 80000 }
     totals = expenses.in_month(month).group(:payer_id).sum(:amount)
 
     # 世帯に参加した順にメンバーを並べ、支出がない人は 0 円にする
     users.order("household_members.created_at").to_h do |user|
-      [ user, totals.fetch(user.id, 0)]
+      [ user, totals.fetch(user.id, 0) ]
     end
   end
 

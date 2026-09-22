@@ -172,4 +172,42 @@ class HouseholdTest < ActiveSupport::TestCase
   test "monthly_total は支出がない月には 0 を返す" do
     assert_equal 0, households(:one).monthly_total(Date.new(2026, 8, 1))
   end
+
+  test "payer_totals はメンバーごとの支払い合計を返す" do
+    household = households(:one)
+    partner = create_user(email: "partner@example.com")
+    household.add_member!(partner)
+    household.expenses.create!(payer: partner, category: categories(:rent), amount: 80000, spent_on: Date.new(2026, 9, 25))
+    household.expenses.create!(payer: users(:one), category: categories(:food), amount: 2000, spent_on: Date.new(2026, 9, 30))
+
+    # expenses(:one) で users(:one) が 9/1 に 3000 円払っている
+    assert_equal({ users(:one) => 5000, partner => 80000 }, household.payer_totals(Date.new(2026, 9, 1)))
+  end
+
+  test "payer_totals は支払いがないメンバーを 0 円にする" do
+    household = households(:one)
+    partner = create_user(email: "partner@example.com")
+    household.add_member!(partner)
+
+    assert_equal 0, household.payer_totals(Date.new(2026, 9, 1))[partner]
+  end
+
+  test "payer_totals は他の月の支出を含まない" do
+    household = households(:one)
+    household.expenses.create!(payer: users(:one), category: categories(:rent), amount: 80000, spent_on: Date.new(2026, 10, 1))
+
+    assert_equal({ users(:one) => 3000 }, household.payer_totals(Date.new(2026, 9, 1)))
+  end
+
+  test "payer_totals は世帯に参加した順に並ぶ" do
+    household = households(:one)
+    partner = create_user(email: "partner@example.com")
+    household.add_member!(partner)
+
+    assert_equal [ users(:one), partner ], household.payer_totals(Date.new(2026, 9, 1)).keys
+  end
+
+  test "payer_totals は他の世帯のメンバーを含まない" do
+    assert_not_includes households(:one).payer_totals(Date.new(2026, 9, 1)).keys, users(:two)
+  end
 end
