@@ -1,0 +1,10 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# target_month は月の1日。from_user / to_user は同じ世帯のメンバーにする
+
+# 世帯2(households(:two))の 2026年8月は精算済み
+# 精算額が 0 円なので、支払う人・受け取る人は空
+two_august:
+  household: two
+  target_month: 2026-08-01
+  amount: 0
+  settled_at: 2026-09-01 10:00:00
