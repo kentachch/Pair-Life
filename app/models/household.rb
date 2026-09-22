@@ -18,6 +18,7 @@ class Household < ApplicationRecord
   has_many :users, through: :household_members
   has_many :categories, dependent: :destroy
   has_many :expenses, dependent: :destroy
+  has_many :settlements, dependent: :destroy
 
   validates :name, presence: true
 
@@ -84,6 +85,11 @@ class Household < ApplicationRecord
             .group("categories.name")     # テーブル名は複数形の categories
             .sum(:amount)
             .sort_by { |_name, amount| -amount } # マイナスを付けると大きい順になる
+  end
+
+  # 指定した月が精算済みかどうか。その月の settlements レコードがあれば精算済み
+  def settled?(month)
+    settlements.exits?(target_month: month.beginning_of_month)
   end
 
   private
