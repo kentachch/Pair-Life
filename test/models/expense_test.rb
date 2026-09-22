@@ -62,4 +62,27 @@ class ExpenseTest < ActiveSupport::TestCase
     assert_not expense.valid?
     assert_includes expense.errors[:category], "はこの世帯のカテゴリーではありません。"
   end
+
+  test "in_month は指定した月の支出だけを返す" do
+    household = households(:one)
+    create = ->(date) { household.expenses.create!(payer: users(:one), category: categories(:food), amount: 100, spent_on: date) }
+    first_day = create.call(Date.new(2026, 10, 1))
+    last_day = create.call(Date.new(2026, 10, 31))
+    create.call(Date.new(2026, 9, 30))  # 前月末
+    create.call(Date.new(2026, 11, 1))  # 翌月1日
+
+    # 月の途中の日付を渡しても、その月の1日〜月末で絞り込まれる
+    assert_equal [ first_day, last_day ].sort_by(&:id), household.expenses.in_month(Date.new(2026, 10, 15)).order(:id).to_a
+  end
+
+  test "recent は日付の新しい順、同じ日付なら後から登録した順に並ぶ" do
+    household = households(:one)
+    create = ->(date) { household.expenses.create!(payer: users(:one), category: categories(:food), amount: 100, spent_on: date) }
+    older = create.call(Date.new(2026, 9, 10))
+    same_day_first = create.call(Date.new(2026, 9, 20))
+    same_day_second = create.call(Date.new(2026, 9, 20))
+
+    # expenses(:one) は 2026-09-01 の支出
+    assert_equal [ same_day_second, same_day_first, older, expenses(:one) ], household.expenses.recent.to_a
+  end
 end
