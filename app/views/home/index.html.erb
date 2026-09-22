@@ -25,13 +25,16 @@
       <div class="rounded-xl bg-white p-6 shadow-sm"
         data-controller="category-chart"
         data-category-chart-url-value="<%= api_category_totals_path(month: @month.strftime('%Y-%m')) %>">
+
         <h3 class="font-semibold text-gray-900">カテゴリ別の支出(<%= @month.strftime("%-m月") %>)</h3>
 
         <div class="mx-auto mt-4 max-w-xs">
           <canvas data-category-chart-target="canvas"></canvas>
+
           <p data-category-chart-target="empty" hidden class="py-8 text-center text-sm text-gray-500">
             今月の支出はまだありません。
           </p>
+
         </div>
       </div>
     </div>
