@@ -1,0 +1,37 @@
+<%# 今月のカレンダー。支出があった日には、その日の合計金額を表示する %>
+<div class="rounded-xl bg-white p-6 shadow-sm">
+  <h3 class="font-semibold text-gray-900"><%= month.strftime("%Y年%-m月") %></h3>
+
+  <table class="mt-4 w-full table-fixed text-center text-sm">
+    <thead>
+      <tr class="text-gray-500">
+        <% %w[日 月 火 水 木 金 土].each do |wday| %>
+          <th class="py-1 font-medium"><%= wday %></th>
+        <% end %>
+      </tr>
+    </thead>
+
+    <tbody>
+      
+      <% calendar_weeks(month).each do |week| %>
+      <%# calendar_weeksには月〜日までの曜日の配列が格納されている %>
+        <tr>
+          <% week.each do |date| %>
+            <td class="h-14 align-top <%= date.month == month.month ? 'text-gray-900' : 'text-gray-300' %>">
+              <div class="<%= 'font-bold text-blue-600' if date == Date.current %>"><%= date.day %></div>
+
+              <% if daily_totals[date] %>
+                <%# dateにはその日の日付が格納されている %>
+                <div class="mx-auto mt-1 truncate rounded bg-blue-50 px-0.5 text-xs text-blue-700">
+                  <%= number_to_currency(daily_totals[date], unit: "¥", precision: 0) %>
+                </div>
+              <% end %>
+
+            </td>
+          <% end %>
+        </tr>
+
+      <% end %>
+    </tbody>
+  </table>
+</div>

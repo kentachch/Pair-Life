@@ -1,8 +1,8 @@
 <header class="border-b bg-white">
     <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <h1 class="text-xl font-bold text-gray-900">
-        共同家計管理アプリ
-        </h1>
+    <%= link_to "共同家計管理アプリ",
+                        root_path, 
+                        class:"text-xl font-bold text-gray-900" %>
 
         <div class="flex items-center gap-4">
         <% if user_signed_in? %>

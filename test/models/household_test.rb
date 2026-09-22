@@ -95,4 +95,24 @@ class HouseholdTest < ActiveSupport::TestCase
 
     assert_equal Household::DEFAULT_CATEGORY_NAMES.sort, household.categories.pluck(:name).sort
   end
+
+  test "category_totals はカテゴリごとの合計を金額の大きい順に返す" do
+    household = households(:one)
+    # expenses(:one) で「食費」に 3000 円が登録済み
+    household.expenses.create!(payer: users(:one), category: categories(:food), amount: 2000, spent_on: Date.new(2026, 9, 5))
+    household.expenses.create!(payer: users(:one), category: categories(:rent), amount: 80000, spent_on: Date.new(2026, 9, 25))
+
+    assert_equal [ [ "家賃", 80000 ], [ "食費", 5000 ] ], household.category_totals(Date.new(2026, 9, 1))
+  end
+
+  test "category_totals は他の月の支出を含まない" do
+    household = households(:one)
+    household.expenses.create!(payer: users(:one), category: categories(:rent), amount: 80000, spent_on: Date.new(2026, 10, 1))
+
+    assert_equal [ [ "食費", 3000 ] ], household.category_totals(Date.new(2026, 9, 1))
+  end
+
+  test "category_totals は支出がない月には空の配列を返す" do
+    assert_equal [], households(:one).category_totals(Date.new(2026, 8, 1))
+  end
 end

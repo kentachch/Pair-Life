@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-gray-50">
-  <!-- メイン -->
   <main class="mx-auto max-w-6xl px-4 py-8">
+
     <!-- ページタイトル -->
     <div class="mb-8 flex items-center justify-between">
       <div>
@@ -17,134 +17,74 @@
           class: "rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
     </div>
 
-    <!-- 今月の集計 -->
-    <div class="mb-8 grid gap-4 sm:grid-cols-3">
-      <div class="rounded-xl bg-white p-6 shadow-sm">
-        <p class="text-sm font-medium text-gray-500">
-          今月の支出
-        </p>
-        <p class="mt-2 text-2xl font-bold text-gray-900">
-          ¥128,500
-        </p>
-      </div>
+    <!-- カレンダーと円グラフ。広い画面では2列、スマホでは1列に並べる -->
+    <div class="mb-8 grid gap-6 lg:grid-cols-2">
+      <%= render "calendar", month: @month, daily_totals: @daily_totals %>
 
-      <div class="rounded-xl bg-white p-6 shadow-sm">
-        <p class="text-sm font-medium text-gray-500">
-          食費
-        </p>
-        <p class="mt-2 text-2xl font-bold text-gray-900">
-          ¥45,800
-        </p>
-      </div>
+      <!-- 円グラフ。データは JavaScript(category_chart_controller.js)が API から取得して描く -->
+      <div class="rounded-xl bg-white p-6 shadow-sm"
+        data-controller="category-chart"
+        data-category-chart-url-value="<%= api_category_totals_path(month: @month.strftime('%Y-%m')) %>">
 
-      <div class="rounded-xl bg-white p-6 shadow-sm">
-        <p class="text-sm font-medium text-gray-500">
-          その他
-        </p>
-        <p class="mt-2 text-2xl font-bold text-gray-900">
-          ¥82,700
-        </p>
+        <h3 class="font-semibold text-gray-900">カテゴリ別の支出(<%= @month.strftime("%-m月") %>)</h3>
+
+        <div class="mx-auto mt-4 max-w-xs">
+          <canvas data-category-chart-target="canvas"></canvas>
+
+          <p data-category-chart-target="empty" hidden class="py-8 text-center text-sm text-gray-500">
+            今月の支出はまだありません。
+          </p>
+
+        </div>
       </div>
     </div>
 
-    <!-- 支出一覧 -->
+    <!-- 最近の支出 -->
     <div class="overflow-hidden rounded-xl bg-white shadow-sm">
-      <div class="border-b px-6 py-4">
-        <h3 class="font-semibold text-gray-900">
-          最近の支出
-        </h3>
+
+      <div class="flex items-center justify-between border-b px-6 py-4">
+        <h3 class="font-semibold text-gray-900">最近の支出</h3>
+        <%= link_to "すべて見る", expenses_path, class: "text-sm font-semibold text-blue-600 hover:underline" %>
       </div>
 
-      <div class="divide-y">
-        <!-- 支出1 -->
-        <div class="flex items-center justify-between px-6 py-5">
-          <div class="flex items-center gap-4">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-              🍚
-            </div>
+      <% if @recent_expenses.any? %>
 
-            <div>
-              <p class="font-medium text-gray-900">
-                スーパー
-              </p>
-              <p class="text-sm text-gray-500">
-                食費 ・ 2026/09/21
+        <div class="divide-y">
+          <% @recent_expenses.each do |expense| %>
+            <div class="flex items-center justify-between px-6 py-5">
+              <div class="flex items-center gap-4">
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                  🍚
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900">
+                    <%= expense.category.name %>
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    <%= expense.spent_on.strftime("%Y/%m/%d") %> ・ <%= expense.payer.name %>
+                  </p>
+                </div>
+              </div>
+              <!-- 金額 -->
+              <p class="font-semibold text-gray-900">
+                <%= number_to_currency(
+                      expense.amount,
+                      unit: "¥",
+                      precision: 0
+                    ) %>
               </p>
             </div>
-          </div>
-
-          <p class="font-semibold text-gray-900">
-            ¥5,280
-          </p>
+          <% end %>
         </div>
 
-        <!-- 支出2 -->
-        <div class="flex items-center justify-between px-6 py-5">
-          <div class="flex items-center gap-4">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-              🚃
-            </div>
+      <% else %>
 
-            <div>
-              <p class="font-medium text-gray-900">
-                電車
-              </p>
-              <p class="text-sm text-gray-500">
-                交通費 ・ 2026/09/20
-              </p>
-            </div>
-          </div>
+        <p class="px-6 py-8 text-center text-sm text-gray-500">
+          まだ支出が登録されていません。
+        </p>
 
-          <p class="font-semibold text-gray-900">
-            ¥860
-          </p>
-        </div>
+      <% end %>
 
-        <!-- 支出3 -->
-        <div class="flex items-center justify-between px-6 py-5">
-          <div class="flex items-center gap-4">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100">
-              🏠
-            </div>
-
-            <div>
-              <p class="font-medium text-gray-900">
-                家賃
-              </p>
-              <p class="text-sm text-gray-500">
-                住居費 ・ 2026/09/20
-              </p>
-            </div>
-          </div>
-
-          <p class="font-semibold text-gray-900">
-            ¥80,000
-          </p>
-        </div>
-
-        <!-- 支出4 -->
-        <div class="flex items-center justify-between px-6 py-5">
-          <div class="flex items-center gap-4">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-              🎬
-            </div>
-
-            <div>
-              <p class="font-medium text-gray-900">
-                映画
-              </p>
-              <p class="text-sm text-gray-500">
-                娯楽費 ・ 2026/09/19
-              </p>
-            </div>
-          </div>
-
-          <p class="font-semibold text-gray-900">
-            ¥3,600
-          </p>
-        </div>
-      </div>
     </div>
   </main>
 </div>
-
