@@ -60,11 +60,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_103158) do
   create_table "settlements", force: :cascade do |t|
     t.integer "amount", default: 0, null: false
     t.datetime "created_at", null: false
-    t.bigint "from_user_id", null: false
+    t.bigint "from_user_id"
     t.bigint "household_id", null: false
     t.datetime "settled_at", null: false
     t.date "target_month", null: false
-    t.bigint "to_user_id", null: false
+    t.bigint "to_user_id"
     t.datetime "updated_at", null: false
     t.index ["from_user_id"], name: "index_settlements_on_from_user_id"
     t.index ["household_id", "target_month"], name: "index_settlements_on_household_id_and_target_month", unique: true
