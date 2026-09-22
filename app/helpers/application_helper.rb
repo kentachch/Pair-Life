@@ -17,4 +17,11 @@ module ApplicationHelper
 
     (amount * 100.0 / total).round
   end
+
+  # ナビゲーションで、今いる画面のリンクを強調するかどうか
+  # 例：nav_active?("expenses") → 支出の画面(一覧・追加・編集)にいるとき true
+  # 「追加」タブのように、強調しないリンクには何も渡さない(常に false)
+  def nav_active?(*controllers)
+    controllers.include?(controller_name)
+  end
 end

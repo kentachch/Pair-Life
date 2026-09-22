@@ -1,20 +1,37 @@
-<header class="border-b bg-white">
-    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-    <%= link_to "共同家計管理アプリ",
-                        root_path, 
-                        class:"text-xl font-bold text-gray-900" %>
+<%# 画面上部のヘッダー。PC(md 以上)ではリンクを横に並べ、スマホでは右上のメニューにまとめる %>
+<header class="sticky top-0 z-20 border-b bg-white">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+    <%= link_to "共同家計管理アプリ", root_path, class: "text-lg font-bold text-gray-900 md:text-xl" %>
 
-        <div class="flex items-center gap-4">
-        <% if user_signed_in? %>
-            <div class="flex items-center justify-end gap-6 p-4">
-                <%= link_to "支出を管理", expenses_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
-                <%= link_to "カテゴリを作る", categories_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
-                <%= link_to "世帯メンバー", household_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
-                <%= link_to "アカウント編集", edit_user_registration_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
-                <%= button_to "ログアウト", destroy_user_session_path, method: :delete,
-                    class: "rounded border px-3 py-1 hover:bg-gray-100" %>
-            </div>
-        <% end %>
+    <% if user_signed_in? %>
+      <%# PC 用のナビゲーション(スマホでは hidden で隠す) %>
+      <nav class="hidden items-center gap-6 md:flex">
+        <%= link_to "支出を管理", expenses_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
+        <%= link_to "カテゴリを作る", categories_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
+        <%= link_to "世帯メンバー", household_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
+        <%= link_to "アカウント編集", edit_user_registration_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
+        <%= button_to "ログアウト", destroy_user_session_path, method: :delete,
+            class: "rounded border px-3 py-1 hover:bg-gray-100" %>
+      </nav>
+
+      <%# スマホ用のメニュー。<details> を使うと JavaScript なしで開閉できる %>
+      <details class="relative md:hidden">
+        <summary class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-lg text-gray-700 hover:bg-gray-100 [&::-webkit-details-marker]:hidden"
+                 aria-label="メニュー">
+          <%= lucide_icon("menu", size: 24) %>
+        </summary>
+
+        <div class="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border bg-white shadow-lg">
+          <p class="border-b px-4 py-3 text-sm text-gray-500"><%= current_user.name %> さん</p>
+          <%= link_to edit_user_registration_path, class: "flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50" do %>
+            <%= lucide_icon("user-pen", size: 18) %> アカウント編集
+          <% end %>
+          <%= button_to destroy_user_session_path, method: :delete,
+              class: "flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50" do %>
+            <%= lucide_icon("log-out", size: 18) %> ログアウト
+          <% end %>
         </div>
-    </div>
+      </details>
+    <% end %>
+  </div>
 </header>
