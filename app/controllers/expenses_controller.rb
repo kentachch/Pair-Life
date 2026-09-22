@@ -50,13 +50,6 @@ class ExpensesController < ApplicationController
 
   private
 
-  # ?month=2026-09 を日付(その月の1日)に変換する。指定がない・形式が正しくないときは今月にする
-  def selected_month
-    Date.strptime(params[:month].to_s, "%Y-%m")
-  rescue Date::Error
-    Date.current.beginning_of_month
-  end
-
   def set_expense
     @expense = current_user.household.expenses.find(params[:id])
   end
