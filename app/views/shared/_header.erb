@@ -9,6 +9,7 @@
         <%= link_to "支出を管理", expenses_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
         <%= link_to "カテゴリを作る", categories_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
         <%= link_to "世帯メンバー", household_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
+        <%= link_to "精算", settlements_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
         <%= link_to "アカウント編集", edit_user_registration_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
         <%= button_to "ログアウト", destroy_user_session_path, method: :delete,
             class: "rounded border px-3 py-1 hover:bg-gray-100" %>
@@ -23,9 +24,14 @@
 
         <div class="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border bg-white shadow-lg">
           <p class="border-b px-4 py-3 text-sm text-gray-500"><%= current_user.name %> さん</p>
+          <%= link_to household_path, class: "flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50" do %>
+            <%= lucide_icon("users", size: 18) %> 世帯メンバー
+          <% end %>
+
           <%= link_to edit_user_registration_path, class: "flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50" do %>
             <%= lucide_icon("user-pen", size: 18) %> アカウント編集
           <% end %>
+
           <%= button_to destroy_user_session_path, method: :delete,
               class: "flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50" do %>
             <%= lucide_icon("log-out", size: 18) %> ログアウト

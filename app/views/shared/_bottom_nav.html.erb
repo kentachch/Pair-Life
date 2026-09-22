@@ -6,7 +6,7 @@
          [ "支出", expenses_path, "receipt", %w[expenses] ],
          [ "追加", new_expense_path, "circle-plus", [] ],
          [ "カテゴリ", categories_path, "tags", %w[categories] ],
-         [ "世帯", household_path, "users", %w[households invitations] ]
+         [ "精算", settlements_path, "handshake", %w[settlements] ]
        ].each do |label, path, icon, controllers| %>
       <li>
         <%# 今いる画面のタブは青くする %>
