@@ -1,5 +1,14 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, skip: [ :registration ]
+
+  devise_scope :user do
+    get   "users/sign_up", to: "devise/registrations#new",    as: :new_user_registration
+    post  "users",         to: "devise/registrations#create", as: :user_registration
+    get   "users/edit",    to: "devise/registrations#edit",   as: :edit_user_registration
+    patch "users",         to: "devise/registrations#update"
+    put   "users",         to: "devise/registrations#update"
+  end
+
   root "home#index"
   resource :household, only: [ :new, :create, :show ] # 世帯の作成・表示
   resource :invitation, only: [ :new, :create ]        # 招待コードでの参加
