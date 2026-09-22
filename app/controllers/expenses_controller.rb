@@ -7,6 +7,8 @@ class ExpensesController < ApplicationController
     # 表示する月(?month=2026-09 のように指定。指定がなければ今月)
     @month = selected_month
 
+    @payer_totals_amount = household.payer_total(@month)
+
     # 表示中の月の支出だけを、日付の新しい順に並べる
     @expenses = household.expenses
                          .in_month(@month)

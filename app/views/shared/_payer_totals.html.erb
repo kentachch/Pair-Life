@@ -1,0 +1,16 @@
+<%# メンバーごとの支払い合計。payer_totals は { User => 金額 } のハッシュ %>
+<ul class="mt-4 divide-y border-t">
+  <% payer_totals.each do |user, amount| %>
+    <li class="flex items-center justify-between py-2 text-sm">
+      <span class="text-gray-700">
+        <%= user.name %>
+        <% if user == current_user %>
+          <span class="text-gray-400">(あなた)</span>
+        <% end %>
+      </span>
+      <span class="font-semibold text-gray-900">
+        <%= number_to_currency(amount, unit: "¥", precision: 0) %>
+      </span>
+    </li>
+  <% end %>
+</ul>

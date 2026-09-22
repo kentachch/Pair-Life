@@ -64,6 +64,16 @@ class Household < ApplicationRecord
     expenses.in_month(month).sum(:amount)
   end
 
+  def payer_total(month)
+    # 支払った人(payer_id)ごとの合計
+    totals = expenses.in_month(month).group(:payer_id).sum(:amount)
+
+    # 世帯に参加した順にメンバーを並べ、支出がない人は 0 円にする
+    users.order("household_members.created_at").to_h do |user|
+      [ user, totals.fetch(user.id, 0)]
+    end
+  end
+
   # 指定した月のカテゴリ別の支出合計を、金額の大きい順に返す
   # 例：[["家賃", 80000], ["食費", 45800], ["日用品", 3200]]
   def category_totals(month)
