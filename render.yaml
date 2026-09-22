@@ -1,0 +1,33 @@
+# Render の設定ファイル(Blueprint)
+# Render の画面で「New → Blueprint」からこのリポジトリを選ぶと、ここに書いた Web サービスが作られる
+# DB は Render ではなく Neon(https://neon.tech)の PostgreSQL を使うので、ここには書かない
+services:
+  - type: web
+    name: kakeibo
+    runtime: ruby
+    plan: free
+    # 日本から一番近いリージョン
+    region: singapore
+    branch: main
+    # main にマージされたら自動でデプロイする
+    autoDeploy: true
+    buildCommand: ./bin/render-build.sh
+    startCommand: bundle exec puma -C config/puma.rb
+    # Rails 8 に最初からある死活監視用の URL。ここが 200 を返せば起動成功とみなされる
+    healthCheckPath: /up
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      # 本番では開発・テスト用の Gem をインストールしない
+      - key: BUNDLE_WITHOUT
+        value: development:test
+      # sync: false の値は、Render の画面で自分で入力する(秘密の値を GitHub に置かないため)
+      # config/master.key の中身
+      - key: RAILS_MASTER_KEY
+        sync: false
+      # Neon の接続 URL(postgresql://...?sslmode=require の形)
+      - key: DATABASE_URL
+        sync: false
+      # 公開される URL のホスト名(例：kakeibo.onrender.com)。メールのリンクに使う
+      - key: APP_HOST
+        sync: false
