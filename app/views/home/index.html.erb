@@ -78,7 +78,7 @@
                     <%= expense.category.name %>
                   </p>
                   <p class="text-sm text-gray-500">
-                    <%= expense.spent_on.strftime("%Y/%m/%d") %> 支払い：👤 <%= expense.payer.name %>
+                    <%= expense.spent_on.strftime("%Y/%m/%d") %> 支払い：<%= expense.payer.name %>
                   </p>
                 </div>
               </div>

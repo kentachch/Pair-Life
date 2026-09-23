@@ -10,9 +10,9 @@
     <% if user_signed_in? %>
       <%# PC 用のナビゲーション(スマホでは hidden で隠す) %>
       <nav class="hidden items-center gap-6 md:flex">
-        <%= link_to "支出を管理", expenses_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
-        <%= link_to "カテゴリを作る", categories_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
-        <%= link_to "世帯メンバー", household_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
+        <%= link_to "支出", expenses_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
+        <%= link_to "カテゴリー", categories_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
+        <%= link_to "メンバー", household_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
         <%= link_to "精算", settlements_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
         <%= link_to "アカウント編集", edit_user_registration_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
         <%= button_to "ログアウト", destroy_user_session_path, method: :delete,
