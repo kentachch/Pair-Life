@@ -5,7 +5,7 @@
     <h1 class="text-2xl font-bold text-gray-900"><%= @household.name %></h1>
 
     <div class="mt-8 rounded-xl bg-white p-6 shadow-sm">
-      <h2 class="font-semibold text-gray-900">メンバー</h2>
+      <h2 class="font-semibold text-gray-900 flex"><%= lucide_icon("users", size: 20) %> メンバー</h2>
       <ul class="mt-3 divide-y">
         <% @household.users.each do |user| %>
           <li class="py-2 text-gray-700">
@@ -25,9 +25,20 @@
         <p class="mt-1 text-sm text-gray-500">
           パートナーにこのコードを伝えて、参加してもらいましょう。
         </p>
-        <p class="mt-4 rounded-lg bg-gray-100 py-3 text-center font-mono text-2xl font-bold tracking-widest text-gray-900">
-          <%= @household.invite_code %>
-        </p>
+        <%# コードと同じ高さのコピーボタンを横に並べる %>
+        <div class="mt-4 flex items-stretch gap-2" data-controller="clipboard">
+          <p class="flex-1 rounded-lg bg-gray-100 px-4 py-3 text-center font-mono text-2xl font-bold tracking-widest text-gray-900"
+             data-clipboard-target="source">
+            <%= @household.invite_code %>
+          </p>
+          <button type="button"
+                  title="招待コードをコピー"
+                  class="flex w-32 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700 disabled:bg-blue-400"
+                  data-action="click->clipboard#copy">
+            <%= lucide_icon("copy", size: 16) %>
+            コピー
+          </button>
+        </div>
       </div>
     <% end %>
 
