@@ -1,7 +1,11 @@
 <%# 画面上部のヘッダー。PC(md 以上)ではリンクを横に並べ、スマホでは右上のメニューにまとめる %>
 <header class="sticky top-0 z-20 border-b bg-white">
   <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
-    <%= link_to "共同家計管理アプリ", root_path, class: "text-lg font-bold text-gray-900 md:text-xl" %>
+    <%# ロゴ。テキストの右にアイコンを並べるため、ブロック形式の link_to にしている %>
+    <%= link_to root_path, class: "flex items-center gap-1.5 text-lg font-bold text-pink-400 md:text-xl" do %>
+      Pair Life
+      <%= lucide_icon("hand-heart", size: 25) %>
+    <% end %>
 
     <% if user_signed_in? %>
       <%# PC 用のナビゲーション(スマホでは hidden で隠す) %>
