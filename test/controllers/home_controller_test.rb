@@ -12,7 +12,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in users(:one)
 
     get root_url
-    assert_select "header a[href=?]", categories_path, text: "カテゴリを作る"
+    assert_select "header a[href=?]", categories_path, text: "カテゴリー"
   end
 
   test "ヘッダーに世帯ページへのリンクがある" do
