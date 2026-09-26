@@ -6,34 +6,22 @@ export default class extends Controller {
 
   async copy(event) {
     const text = this.sourceTarget.textContent.trim();
-    // 中に入っている文字列を取得
+    // 招待コードを取得
+
+    const button = event.currentTarget;
+    // HTML側のbutton要素を取得
 
     try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-        // クリップボードにコピーできる
-      } else {
-        this.#copyByExecCommand(text);
+      if (!navigator.clipboard || !window.isSecureContext) {
+        throw new Error("この環境ではクリップボードにコピーできません。");
       }
-      this.#showCopied(event.currentTarget);
+
+      await navigator.clipboard.writeText(text);
+      this.#showCopied(button);
     } catch (error) {
       console.error(error);
-      // コピーできなかったときは手動で選択してもらう
       window.prompt("招待コードをコピーしてください", text);
     }
-  }
-
-  // 画面外に置いた textarea を選択してコピーする古い方式
-  #copyByExecCommand(text) {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.style.position = "fixed";
-    textarea.style.left = "-9999px";
-    document.body.appendChild(textarea);
-    textarea.select();
-    const copied = document.execCommand("copy");
-    document.body.removeChild(textarea);
-    if (!copied) throw new Error("execCommand によるコピーに失敗しました");
   }
 
   // ボタンのラベルを一時的に「コピーしました」に差し替える
@@ -41,7 +29,7 @@ export default class extends Controller {
     if (!button) return;
 
     const original = button.innerHTML;
-    button.innerHTML = "コピーしました";
+    button.innerHTML = "Copied!!";
     button.disabled = true;
 
     setTimeout(() => {
