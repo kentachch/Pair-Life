@@ -65,7 +65,13 @@ docker compose exec web bin/rails db:migrate
 `database_authenticatable`、`registerable`、`recoverable`、`rememberable`、`validatable`
 
 - メール確認(`confirmable`)などは MVP では使用しない
-- 将来の Google / LINE ログインは `omniauthable` と `omniauth` 系の Gem で追加する予定
+
+### Google ログイン(MVP後に追加)
+
+- `omniauthable` と `omniauth-google-oauth2` で実装。`users.provider` / `users.uid` で Google アカウントと紐付ける
+- ユーザーの特定は `User.from_omniauth` で行う。Google がメールアドレスを確認済み(`email_verified`)の場合のみ、同じメールアドレスの既存アカウントに自動で紐付ける
+- クライアントID/シークレットは Rails credentials の `google.client_id` / `google.client_secret` に保存する
+- LINE ログインも同じ `provider` / `uid` カラムで追加する予定
 
 ### 実装上のルール
 

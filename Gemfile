@@ -74,3 +74,6 @@ group :test do
 end
 
 gem "lucide-rails", "~> 0.7.4"
+
+gem "omniauth-google-oauth2", "~> 1.2"
+gem "omniauth-rails_csrf_protection", "~> 2.0"
