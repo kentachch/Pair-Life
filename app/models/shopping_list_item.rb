@@ -1,6 +1,6 @@
 class ShoppingListItem < ApplicationRecord
   # 一覧の見出しはこの順番で並べる(スーパーの売り場を回る順番)
-  CATEGORIES = %w[野菜・果物 肉・魚 乳製品・卵 米・パン・パスタ 調味料 生活日用品 その他].freeze
+  CATEGORIES = %w[野菜・果物 肉・魚 乳製品・卵 米・パン・パスタ 調味料 日用品 その他].freeze
 
   belongs_to :shopping_list
   # added_by_id は users テーブルを参照するので、class_name で User モデルを指定する
