@@ -75,7 +75,7 @@
 | 開発環境 | Docker / Docker Compose |
 | 認証 | Devise |
 
-## テーブル設計(MVP)
+## テーブル設計
 
 ```mermaid
 erDiagram
@@ -84,18 +84,23 @@ erDiagram
     households ||--o{ categories : "持つ"
     households ||--o{ expenses : "持つ"
     households ||--o{ settlements : "持つ"
+    households ||--o| shopping_lists : "持つ"
     categories ||--o{ expenses : "分類する"
     users ||--o{ expenses : "支払う(payer)"
     users |o--o{ settlements : "支払う / 受け取る"
+    shopping_lists ||--o{ shopping_list_items : "持つ"
+    users ||--o{ shopping_list_items : "追加する(added_by)"
 
     users {
         bigint id PK
         string email "ユニーク"
         string encrypted_password
         string name
-        string reset_password_token
+        string reset_password_token "ユニーク"
         datetime reset_password_sent_at
         datetime remember_created_at
+        string provider "provider + uid でユニーク"
+        string uid
     }
     households {
         bigint id PK
@@ -111,7 +116,8 @@ erDiagram
     categories {
         bigint id PK
         bigint household_id FK
-        string name
+        string name "household_id + name でユニーク"
+        string icon "初期値tag"
     }
     expenses {
         bigint id PK
@@ -124,36 +130,69 @@ erDiagram
     }
     settlements {
         bigint id PK
-        bigint household_id FK
+        bigint household_id FK "household_id + target_month でユニーク"
         date target_month
-        bigint from_user_id FK
-        bigint to_user_id FK
-        integer amount
+        bigint from_user_id FK "空を許可"
+        bigint to_user_id FK "空を許可"
+        integer amount "初期値0"
         datetime settled_at
+    }
+    shopping_lists {
+        bigint id PK
+        bigint household_id FK "ユニーク"
+    }
+    shopping_list_items {
+        bigint id PK
+        bigint shopping_list_id FK
+        bigint added_by_id FK
+        string name "shopping_list_id + name でユニーク"
+        string category
+        integer quantity "初期値1"
+        boolean is_essential "初期値true"
+        boolean purchased "初期値false"
+        string memo
     }
 ```
 
 | テーブル | 役割 |
 | --- | --- |
-| users | ユーザー情報。Devise で管理する(`name` は独自に追加) |
+| users | ユーザー情報。Devise で管理する(`name` は独自に追加)。`provider` / `uid` は Google ログインの紐付けに使う |
 | households | 世帯(2人で共有する家計の単位)。招待コードを持つ |
 | household_members | 世帯とユーザーを結ぶ中間テーブル。負担割合を持つ |
-| categories | 支出のカテゴリ。世帯ごとに管理する |
+| categories | 支出のカテゴリ。世帯ごとに管理する。`icon` には Lucide のアイコン名を保存する |
 | expenses | 支出。`payer_id` は「誰が払ったか」を表し、users テーブルを参照する |
-| settlements | 精算の記録。レコードがある月は精算済みとして扱う |
+| settlements | 精算の記録。レコードがある月は精算済みとして扱う。`target_month` には対象月の1日を保存する |
+| shopping_lists | 買い物リスト。1世帯に1つ |
+| shopping_list_items | 買い物リストの商品。`added_by_id` は最初に追加した人を表し、users テーブルを参照する |
 
-※ users テーブルのうち `name` 以外のカラムは、`bin/rails g devise User` で自動生成されます。
+※ users テーブルのうち `name`・`provider`・`uid` 以外のカラムは、`bin/rails g devise User` で自動生成されます。
+
+※ `shopping_list_items.category` は `ShoppingListItem::CATEGORIES` の定数で固定しており、支出の categories テーブルとは連携しません。
 
 ### 主なモデルの関連
 
 ```ruby
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable,
+         :omniauthable, omniauth_providers: [ :google_oauth2 ]
 
   has_one :household_member, dependent: :destroy
   has_one :household, through: :household_member
-  has_many :paid_expenses, class_name: "Expense", foreign_key: :payer_id
+end
+
+class Household < ApplicationRecord
+  has_many :household_members, dependent: :destroy
+  has_many :users, through: :household_members
+  has_many :categories, dependent: :destroy
+  has_many :expenses, dependent: :destroy
+  has_many :settlements, dependent: :destroy
+  has_one :shopping_list, dependent: :destroy
+end
+
+class Category < ApplicationRecord
+  belongs_to :household
+  has_many :expenses, dependent: :restrict_with_error
 end
 
 class Expense < ApplicationRecord
@@ -167,9 +206,19 @@ class Settlement < ApplicationRecord
   belongs_to :from_user, class_name: "User", optional: true
   belongs_to :to_user, class_name: "User", optional: true
 end
+
+class ShoppingList < ApplicationRecord
+  belongs_to :household
+  has_many :items, class_name: "ShoppingListItem", dependent: :destroy
+end
+
+class ShoppingListItem < ApplicationRecord
+  belongs_to :shopping_list
+  belongs_to :added_by, class_name: "User"
+end
 ```
 
-`payer_id`・`from_user_id`・`to_user_id` はいずれも users テーブルを参照するため、`class_name: "User"` を指定しています。settlements の `from_user` / `to_user` は、精算額が0円の月も精算済みとして記録できるよう空を許可しています。
+`payer_id`・`from_user_id`・`to_user_id`・`added_by_id` はいずれも users テーブルを参照するため、`class_name: "User"` を指定しています。settlements の `from_user` / `to_user` は、精算額が0円の月も精算済みとして記録できるよう空を許可しています。支出が登録されているカテゴリは、`dependent: :restrict_with_error` によって削除できないようにしています。
 
 ## MVP後の開発計画
 
