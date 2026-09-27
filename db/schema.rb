@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_27_005333) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_27_030349) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -72,6 +72,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_27_005333) do
     t.index ["to_user_id"], name: "index_settlements_on_to_user_id"
   end
 
+  create_table "shopping_list_items", force: :cascade do |t|
+    t.bigint "added_by_id", null: false
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.boolean "is_essential", default: true, null: false
+    t.string "memo"
+    t.string "name", null: false
+    t.boolean "purchased", default: false, null: false
+    t.integer "quantity", default: 1, null: false
+    t.bigint "shopping_list_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["added_by_id"], name: "index_shopping_list_items_on_added_by_id"
+    t.index ["shopping_list_id", "name"], name: "index_shopping_list_items_on_shopping_list_id_and_name", unique: true
+    t.index ["shopping_list_id"], name: "index_shopping_list_items_on_shopping_list_id"
+  end
+
+  create_table "shopping_lists", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "household_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["household_id"], name: "index_shopping_lists_on_household_id", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -97,4 +120,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_27_005333) do
   add_foreign_key "settlements", "households"
   add_foreign_key "settlements", "users", column: "from_user_id"
   add_foreign_key "settlements", "users", column: "to_user_id"
+  add_foreign_key "shopping_list_items", "shopping_lists"
+  add_foreign_key "shopping_list_items", "users", column: "added_by_id"
+  add_foreign_key "shopping_lists", "households"
 end
