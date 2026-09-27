@@ -19,11 +19,20 @@ class Household < ApplicationRecord
   has_many :categories, dependent: :destroy
   has_many :expenses, dependent: :destroy
   has_many :settlements, dependent: :destroy
+  has_one :shopping_list, dependent: :destroy
 
   validates :name, presence: true
 
   # 世帯を作るときに招待コードを自動で発行する
   before_create :generate_invite_code
+
+  # 買い物リストを返す。まだなければ作る(既存の世帯にはリストがないため)
+  def shopping_list!
+    shopping_list || create_shopping_list!
+  rescue ActiveRecord::RecordNotUnique
+    # 2人が同時に初めて開くと、両方が作ろうとしてユニークインデックス違反になる。そのときは作られた方を取り直す
+    reload_shopping_list
+  end
 
   def full? # 世帯の人数が上限に達しているかどうかを判定する
     household_members.count >= MAX_MEMBERS

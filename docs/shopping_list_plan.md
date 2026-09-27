@@ -34,13 +34,10 @@
 1. 野菜・果物
 2. 肉・魚
 3. 乳製品・卵
-4. 冷凍食品
-5. 主食・パン
-6. 調味料
-7. 飲み物
-8. お菓子
-9. 日用品
-10. その他
+4. 米・パン
+5. 調味料
+6. 日用品
+7. その他
 
 ### 並び順
 
@@ -90,13 +87,13 @@
 
 ### ShoppingListItem(新規)
 
-- `CATEGORIES` 定数(上の10個、順番どおり)
+- `CATEGORIES` 定数(上の7個、順番どおり)
 - `belongs_to :shopping_list`
 - `belongs_to :added_by, class_name: "User"`
 - バリデーション
   - name: 必須、最大30文字
   - quantity: 必須、整数、1以上
-  - memo: 最大255文字
+  - memo: 最大100文字
   - category: 必須、`CATEGORIES` に含まれる
   - is_essential / purchased: true か false(`inclusion: { in: [ true, false ] }`)
   - 重複: 同じリストに同じ名前がないか、自作のバリデーションで確認する。相手がチェック済みなら「チェックを外してください」のメッセージにする(上の表を参照)
