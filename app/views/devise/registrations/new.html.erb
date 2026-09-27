@@ -10,7 +10,7 @@
       <div class="space-y-6">
         <!-- 名前 -->
         <div>
-          <%= f.label :name, class: "mb-2 block text-sm font-medium text-gray-700" %>
+          <%= f.label :name, "名前", class: "mb-2 block text-sm font-medium text-gray-700" %>
           <%= f.text_field :name,
               autofocus: true,
               class: "block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" %>
@@ -18,7 +18,7 @@
 
         <!-- メールアドレス -->
         <div>
-          <%= f.label :email, class: "mb-2 block text-sm font-medium text-gray-700" %>
+          <%= f.label :email, "メールアドレス", class: "mb-2 block text-sm font-medium text-gray-700" %>
           <%= f.email_field :email,
               autocomplete: "email",
               class: "block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" %>
@@ -26,7 +26,7 @@
 
         <!-- パスワード -->
         <div>
-          <%= f.label :password, class: "mb-2 block text-sm font-medium text-gray-700" %>
+          <%= f.label :password, "パスワードを設定する", class: "mb-2 block text-sm font-medium text-gray-700" %>
 
           <% if @minimum_password_length %>
             <p class="mb-2 text-sm text-gray-500">
@@ -41,7 +41,7 @@
 
         <!-- パスワード確認 -->
         <div>
-          <%= f.label :password_confirmation, class: "mb-2 block text-sm font-medium text-gray-700" %>
+          <%= f.label :password_confirmation, "パスワード確認", class: "mb-2 block text-sm font-medium text-gray-700" %>
           <%= f.password_field :password_confirmation,
               autocomplete: "new-password",
               class: "block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" %>

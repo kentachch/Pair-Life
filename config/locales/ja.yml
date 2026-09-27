@@ -1,0 +1,12 @@
+ja:
+  activerecord:
+    attributes:
+      expense:
+        category: "カテゴリー"
+        amount: "金額"
+
+  errors:
+    messages:
+      blank: "を入力してください"
+      required: "を入力してください"
+      not_a_number: "は数値で入力してください"
