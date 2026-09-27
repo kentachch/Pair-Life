@@ -4,9 +4,24 @@ ja:
       expense:
         category: "カテゴリー"
         amount: "金額"
+      shopping_list_item:
+        name: "商品名"
+        quantity: "個数"
+        memo: "メモ"
+        category: "カテゴリ"
+        is_essential: "必須/任意"
+        added_by: "追加した人"
 
   errors:
+    # 属性名とメッセージのあいだに空白を入れない(例: 「商品名を入力してください」)
+    format: "%{attribute}%{message}"
     messages:
       blank: "を入力してください"
       required: "を入力してください"
       not_a_number: "は数値で入力してください"
+      not_an_integer: "は整数で入力してください"
+      greater_than: "は%{count}より大きい値にしてください"
+      greater_than_or_equal_to: "は%{count}以上の値にしてください"
+      too_long: "は%{count}文字以内で入力してください"
+      inclusion: "は一覧にありません"
+      taken: "はすでに存在します"

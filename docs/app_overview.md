@@ -29,6 +29,7 @@
 | カテゴリ管理 | 初期カテゴリに加え、自由に追加・変更・削除 |
 | 月別集計 | 月ごとの支出合計、支払った人ごとの合計を自動集計 |
 | 精算 | 「誰が誰にいくら支払うか」を自動計算し、精算済みとして記録 |
+| 買い物リスト | 買う物を世帯の2人で共有する。カテゴリ別に表示し、買った物にチェックを入れる(MVP後に追加) |
 
 ## 仕様の詳細
 
@@ -57,6 +58,18 @@
 - 精算は対象月が終わってから実行できる
 - 精算済みの月は、支出の追加・編集・削除ができない
 - 精算の記録はどちらのメンバーでも取り消せる。取り消すとその月の支出を再び編集できる
+
+### 買い物リスト(MVP後に追加)
+
+- 1世帯に1つ。パートナーの参加前でも使える。既存の世帯には、初めて開いたときに作る
+- アイテムの項目は、商品名(30文字まで)・個数(1以上の整数、初期値1)・メモ(100文字まで)・カテゴリ・必須/任意(初期値は必須)
+- 「○○さんが追加」と表示する。編集しても、最初に追加した人のまま
+- カテゴリは「野菜・果物 / 肉・魚 / 乳製品・卵 / 米・パン / 調味料 / 日用品 / その他」で固定(家計のカテゴリとは別)。スーパーの売り場を回る順に見出しを並べ、アイテムがないカテゴリの見出しは出さない
+- カテゴリ内は「未チェック → チェック済み」「必須 → 任意」「追加が古い順」に並べる
+- 買った物にチェックを入れると、取り消し線 + グレーで表示する。チェックは外せる
+- 「チェック済みを削除」でまとめて削除する(履歴は残さない)。個別の削除は編集画面から行う
+- 同じリストに同じ商品名は登録できない(前後の空白を除いて完全一致で判定)。チェック済みの物と重複したときは、チェックを外すよう案内する
+- 支出とは連携しない。相手の操作は、ページを再読み込みしたときに反映される
 
 ## 精算の計算方法
 
@@ -95,6 +108,9 @@ erDiagram
     categories ||--o{ expenses : "分類する"
     users ||--o{ expenses : "支払う(payer)"
     users |o--o{ settlements : "支払う / 受け取る"
+    households ||--o| shopping_lists : "持つ"
+    shopping_lists ||--o{ shopping_list_items : "持つ"
+    users ||--o{ shopping_list_items : "追加する(added_by)"
 
     users {
         bigint id PK
@@ -137,6 +153,21 @@ erDiagram
         integer amount
         datetime settled_at
     }
+    shopping_lists {
+        bigint id PK
+        bigint household_id FK "ユニーク"
+    }
+    shopping_list_items {
+        bigint id PK
+        bigint shopping_list_id FK
+        bigint added_by_id FK
+        string name "リスト内でユニーク"
+        integer quantity "初期値1"
+        string memo
+        string category
+        boolean is_essential "初期値true"
+        boolean purchased "初期値false"
+    }
 ```
 
 | テーブル | 役割 |
@@ -147,6 +178,8 @@ erDiagram
 | categories | 支出のカテゴリ。世帯ごとに管理する |
 | expenses | 支出。`payer_id` は「誰が払ったか」を表し、users テーブルを参照する |
 | settlements | 精算の記録。レコードがある月は精算済みとして扱う。`household_id` と `target_month` の組み合わせはユニーク |
+| shopping_lists | 買い物リスト。1世帯に1つ(`household_id` はユニーク) |
+| shopping_list_items | 買い物リストのアイテム。`added_by_id` は「誰が追加したか」を表し、users テーブルを参照する。`shopping_list_id` と `name` の組み合わせはユニーク |
 
 ※ 認証には Devise を使用します。ログイン状態は Cookie で管理するため、sessions テーブルは作成しません。
 

@@ -1,0 +1,31 @@
+<%# 一覧の1行分。チェック済みは取り消し線 + グレーで表示する %>
+<li class="flex items-start gap-3 px-4 py-3">
+  <%# JavaScript なしで動くよう、チェックボックスの見た目をしたボタン(button_to)にしている %>
+  <%= button_to toggle_purchased_shopping_list_item_path(item), method: :patch,
+      class: "mt-0.5 flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md border-2 #{item.purchased? ? 'border-gray-400 bg-gray-400 text-white' : 'border-gray-300 bg-white hover:border-blue-500'}",
+      aria: { label: item.purchased? ? "「#{item.name}」のチェックを外す" : "「#{item.name}」をチェックする" } do %>
+    <%= lucide_icon("check", size: 16) if item.purchased? %>
+  <% end %>
+
+  <div class="min-w-0 flex-1 <%= 'text-gray-400' if item.purchased? %>">
+    <p class="flex flex-wrap items-center gap-x-2 gap-y-1">
+      <span class="font-medium <%= item.purchased? ? 'line-through' : 'text-gray-900' %>"><%= item.name %></span>
+      <span class="text-sm <%= 'line-through' if item.purchased? %>">×<%= item.quantity %></span>
+      <% if item.is_essential? %>
+        <span class="rounded-full px-2 py-0.5 text-xs font-semibold <%= item.purchased? ? 'bg-gray-100 text-gray-400' : 'bg-red-50 text-red-600' %>">必須</span>
+      <% else %>
+        <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold <%= item.purchased? ? 'text-gray-400' : 'text-gray-600' %>">任意</span>
+      <% end %>
+    </p>
+    <% if item.memo.present? %>
+      <p class="mt-0.5 text-sm <%= item.purchased? ? 'line-through' : 'text-gray-600' %>"><%= item.memo %></p>
+    <% end %>
+    <p class="mt-0.5 text-xs <%= 'text-gray-500' unless item.purchased? %>"><%= item.added_by.name %>さんが追加</p>
+  </div>
+
+  <%= link_to edit_shopping_list_item_path(item),
+      class: "shrink-0 rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700",
+      aria: { label: "「#{item.name}」を編集" } do %>
+    <%= lucide_icon("pencil", size: 18) %>
+  <% end %>
+</li>

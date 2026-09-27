@@ -1,0 +1,35 @@
+<% content_for(:title) { "買い物リスト" } %>
+
+<div class="min-h-screen bg-gray-50">
+  <main class="mx-auto max-w-2xl px-4 py-6 sm:py-12">
+    <h1 class="text-2xl font-bold text-gray-900">買い物リスト</h1>
+
+    <%# 追加フォーム %>
+    <div class="mt-6 rounded-xl bg-white p-4 shadow-sm sm:p-6">
+      <%= render "form", item: @item %>
+    </div>
+
+    <%# カテゴリごとのアイテム一覧(アイテムが0件のカテゴリは見出しを出さない) %>
+    <% if @items_by_category.any? %>
+      <div class="mt-8 space-y-6">
+        <% @items_by_category.each do |category, items| %>
+          <section>
+            <h2 class="px-1 text-sm font-semibold text-gray-500"><%= category %></h2>
+            <ul class="mt-2 divide-y divide-gray-100 rounded-xl bg-white shadow-sm">
+              <%= render partial: "item", collection: items %>
+            </ul>
+          </section>
+        <% end %>
+      </div>
+
+      <%# チェック済みが1件以上あるときだけ表示する %>
+      <% if @has_purchased %>
+        <%= button_to "チェック済みを削除", clear_purchased_shopping_list_items_path, method: :delete,
+            form: { data: { turbo_confirm: "チェック済みの物をすべて削除しますか?" }, class: "mt-6" },
+            class: "w-full cursor-pointer rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50" %>
+      <% end %>
+    <% else %>
+      <p class="mt-8 rounded-xl bg-white px-6 py-8 text-center text-sm text-gray-500 shadow-sm">買う物はありません</p>
+    <% end %>
+  </main>
+</div>

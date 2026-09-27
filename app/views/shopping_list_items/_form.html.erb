@@ -1,0 +1,50 @@
+<%# 追加(一覧画面)と編集で共用するフォーム。item が新規か既存かで送信先が自動で切り替わる %>
+<%= form_with model: item do |f| %>
+  <%= render "shared/error_messages", object: item %>
+
+  <div class="space-y-4">
+    <div class="flex gap-3">
+      <div class="min-w-0 flex-1">
+        <%= f.label :name, "商品名", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :name, maxlength: 30, placeholder: "例：牛乳",
+            class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
+      </div>
+      <div class="w-20">
+        <%= f.label :quantity, "個数", class: "block text-sm font-medium text-gray-700" %>
+        <%# inputmode: "numeric" で、スマホでは数字のキーボードが表示される %>
+        <%= f.number_field :quantity, min: 1, step: 1, inputmode: "numeric",
+            class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-end gap-3">
+      <div class="min-w-0 flex-1">
+        <%= f.label :category, "カテゴリ", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.select :category, ShoppingListItem::CATEGORIES, {},
+            class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
+      </div>
+
+      <fieldset>
+        <legend class="sr-only">必須/任意</legend>
+        <%# ラジオボタン自体は隠し(sr-only)、選ばれた方をボタン風に色付けする(has-checked:) %>
+        <div class="flex overflow-hidden rounded-lg border border-gray-300 text-sm">
+          <label class="cursor-pointer px-4 py-2 text-gray-600 has-checked:bg-red-500 has-checked:font-semibold has-checked:text-white">
+            <%= f.radio_button :is_essential, true, class: "sr-only" %>必須
+          </label>
+          <label class="cursor-pointer border-l border-gray-300 px-4 py-2 text-gray-600 has-checked:bg-gray-500 has-checked:font-semibold has-checked:text-white">
+            <%= f.radio_button :is_essential, false, class: "sr-only" %>任意
+          </label>
+        </div>
+      </fieldset>
+    </div>
+
+    <div>
+      <%= f.label :memo, "メモ(任意)", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :memo, maxlength: 100, placeholder: "例：あれば買ってくる",
+          class: "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" %>
+    </div>
+  </div>
+
+  <%= f.submit item.new_record? ? "リストに追加" : "保存する",
+      class: "mt-6 w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
+<% end %>

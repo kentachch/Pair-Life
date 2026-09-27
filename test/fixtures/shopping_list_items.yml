@@ -1,0 +1,40 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# households(:one) のリスト
+milk:
+  shopping_list: one
+  added_by: one
+  name: 牛乳
+  quantity: 2
+  memo: 低脂肪
+  category: 乳製品・卵
+  is_essential: true
+  purchased: false
+
+cabbage:
+  shopping_list: one
+  added_by: one
+  name: キャベツ
+  quantity: 1
+  category: 野菜・果物
+  is_essential: false
+  purchased: false
+
+detergent:
+  shopping_list: one
+  added_by: one
+  name: 洗剤
+  quantity: 1
+  category: 日用品
+  is_essential: true
+  purchased: true
+
+# households(:two) のリスト
+other_household_item:
+  shopping_list: two
+  added_by: two
+  name: 豆腐
+  quantity: 1
+  category: その他
+  is_essential: true
+  purchased: false

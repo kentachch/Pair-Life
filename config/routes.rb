@@ -20,6 +20,12 @@ Rails.application.routes.draw do
   resources :categories, except: [ :show ]
   resources :expenses, except: [ :show ]
   resources :settlements, only: [ :index, :create ]
+  resources :shopping_list_items, only: [ :index, :create, :edit, :update, :destroy ] do
+    member     { patch  :toggle_purchased } # チェックを入れる・外す
+    collection { delete :clear_purchased }  # チェック済みをまとめて削除
+    # 1つの商品を操作する → member
+    # チェック済みの商品をまとめて操作する → collection
+  end
 
   # JSON を返す API は、画面用の URL と区別するため /api の下にまとめる
   namespace :api do

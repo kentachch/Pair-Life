@@ -11,6 +11,7 @@
       <%# PC 用のナビゲーション(スマホでは hidden で隠す) %>
       <nav class="hidden items-center gap-6 md:flex">
         <%= link_to "支出", expenses_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
+        <%= link_to "買い物", shopping_list_items_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
         <%= link_to "カテゴリー", categories_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
         <%= link_to "メンバー", household_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
         <%= link_to "精算", settlements_path, class: "text-md font-bold text-gray-900 hover:text-blue-600" %>
@@ -28,6 +29,11 @@
 
         <div class="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border bg-white shadow-lg">
           <p class="border-b px-4 py-3 text-sm text-gray-500"><%= current_user.name %> さん</p>
+          <%# カテゴリは下部タブバーから外したので、メニューから開く %>
+          <%= link_to categories_path, class: "flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50" do %>
+            <%= lucide_icon("tags", size: 18) %> カテゴリ
+          <% end %>
+
           <%= link_to household_path, class: "flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50" do %>
             <%= lucide_icon("users", size: 18) %> 世帯メンバー
           <% end %>

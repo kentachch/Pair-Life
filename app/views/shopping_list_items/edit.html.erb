@@ -1,0 +1,21 @@
+<% content_for(:title) { "買い物リストを編集" } %>
+
+<div class="min-h-screen bg-gray-50">
+  <main class="mx-auto max-w-md px-4 py-6 sm:py-12">
+    <h1 class="text-2xl font-bold text-gray-900">アイテムを編集</h1>
+    <p class="mt-1 text-sm text-gray-500"><%= @item.added_by.name %>さんが追加</p>
+
+    <div class="mt-6 rounded-xl bg-white p-6 shadow-sm">
+      <%= render "form", item: @item %>
+    </div>
+
+    <%# 登録ミスの取り消し用 %>
+    <%= button_to "削除", shopping_list_item_path(@item), method: :delete,
+        form: { data: { turbo_confirm: "「#{@item.name}」を削除しますか?" }, class: "mt-4" },
+        class: "w-full cursor-pointer rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50" %>
+
+    <div class="mt-6 text-center">
+      <%= link_to "買い物リストへ戻る", shopping_list_items_path, class: "text-sm font-semibold text-blue-600 hover:underline" %>
+    </div>
+  </main>
+</div>
