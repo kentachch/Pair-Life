@@ -1,19 +1,4 @@
 class Household < ApplicationRecord
-  MAX_MEMBERS = 2
-
-  DEFAULT_CATEGORIES = {
-    "家賃" => "house",
-    "水道代" => "droplet",
-    "電気代" => "zap",
-    "ガス代" => "flame",
-    "食費" => "shopping-basket",
-    "日用品" => "spray-can",
-    "外食" => "utensils",
-    "雑費" => "shapes",
-    "交際費" => "gift",
-    "その他" => "circle-ellipsis"
-  }.freeze
-
   has_many :household_members, dependent: :destroy
   has_many :users, through: :household_members
   has_many :categories, dependent: :destroy
@@ -26,22 +11,15 @@ class Household < ApplicationRecord
   # 世帯を作るときに招待コードを自動で発行する
   before_create :generate_invite_code
 
-  # 買い物リストを返す。まだなければ作る(既存の世帯にはリストがないため)
-  def shopping_list!
-    shopping_list || create_shopping_list!
-  rescue ActiveRecord::RecordNotUnique
-    # 2人が同時に初めて開くと、両方が作ろうとしてユニークインデックス違反になる。そのときは作られた方を取り直す
-    reload_shopping_list
-  end
-
-  def full? # 世帯の人数が上限に達しているかどうかを判定する
+  MAX_MEMBERS = 2
+  def full?
     household_members.count >= MAX_MEMBERS
   end
 
   # 世帯を作成し、作成者を1人目のメンバーとして登録する
-  # 途中で失敗したら両方なかったことにするため、トランザクションでまとめる
   def self.create_with_owner!(name:, user:) # nameとuserを引数として受け取る
     transaction do
+      # 途中で失敗したら両方なかったことにするため、トランザクションでまとめる
       household = create!(name: name)
 
       # 世帯作成時に初期カテゴリを自動で作る
@@ -61,9 +39,22 @@ class Household < ApplicationRecord
 
   # 初期カテゴリのうち、まだない物を追加する。何度実行しても同じカテゴリは重複しない
   # 同じ名前のカテゴリがすでにあり、アイコンが未設定(初期値の "tag")なら、初期カテゴリのアイコンにする
+    DEFAULT_CATEGORIES = {
+    "家賃" => "house",
+    "水道代" => "droplet",
+    "電気代" => "zap",
+    "ガス代" => "flame",
+    "食費" => "shopping-basket",
+    "日用品" => "spray-can",
+    "外食" => "utensils",
+    "雑費" => "shapes",
+    "交際費" => "gift",
+    "その他" => "circle-ellipsis"
+  }.freeze
+
   def add_default_categories!
     DEFAULT_CATEGORIES.each do |name, icon|
-      category = categories.find_or_initialize_by(name: name) # 探してなければ作る
+      category = categories.find_or_initialize_by(name: name) # 世帯が持っているカテゴリーの中から探してなければ作る
       category.icon = icon if category.new_record? || category.icon == Category::DEFAULT_ICON
       category.save!
     end
@@ -72,12 +63,12 @@ class Household < ApplicationRecord
   # 指定した月の支出の合計金額
   def monthly_total(month)
     expenses.in_month(month).sum(:amount)
+    # その月の支出の合計額を計算している
   end
 
   # 指定した月に、メンバーそれぞれが支払った合計金額
-  # 例：{ ユーザー1 => 120000, ユーザー2 => 80000 }
   def payer_totals(month)
-    # 支払った人(payer_id)ごとの合計 → { 1 => 120000, 2 => 80000 }
+    # 支払った人(payer_id)ごとの合計をまず算出する
     totals = expenses.in_month(month).group(:payer_id).sum(:amount)
 
     # 世帯に参加した順にメンバーを並べ、支出がない人は 0 円にする
@@ -99,6 +90,14 @@ class Household < ApplicationRecord
   # 指定した月が精算済みかどうか。その月の settlements レコードがあれば精算済み
   def settled?(month)
     settlements.exists?(target_month: month.beginning_of_month)
+  end
+
+  # 買い物リストを返す。まだなければ作る(既存の世帯にはリストがないため)
+  def shopping_list!
+    shopping_list || create_shopping_list!
+  rescue ActiveRecord::RecordNotUnique
+    # 2人が同時に初めて開くと、両方が作ろうとしてユニークインデックス違反になる。そのときは作られた方を取り直す
+    reload_shopping_list
   end
 
   private
