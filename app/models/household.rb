@@ -37,8 +37,6 @@ class Household < ApplicationRecord
     end
   end
 
-  # 初期カテゴリのうち、まだない物を追加する。何度実行しても同じカテゴリは重複しない
-  # 同じ名前のカテゴリがすでにあり、アイコンが未設定(初期値の "tag")なら、初期カテゴリのアイコンにする
     DEFAULT_CATEGORIES = {
     "家賃" => "house",
     "水道代" => "droplet",
