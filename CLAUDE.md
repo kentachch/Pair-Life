@@ -71,7 +71,6 @@ docker compose exec web bin/rails db:migrate
 - `omniauthable` と `omniauth-google-oauth2` で実装。`users.provider` / `users.uid` で Google アカウントと紐付ける
 - ユーザーの特定は `User.from_omniauth` で行う。Google がメールアドレスを確認済み(`email_verified`)の場合のみ、同じメールアドレスの既存アカウントに自動で紐付ける
 - クライアントID/シークレットは Rails credentials の `google.client_id` / `google.client_secret` に保存する
-- LINE ログインも同じ `provider` / `uid` カラムで追加する予定
 
 ### 実装上のルール
 
