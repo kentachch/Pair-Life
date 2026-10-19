@@ -23,7 +23,7 @@ gem "tailwindcss-rails"
 
 gem "i18n"
 # json 3 系は JSON.parse の引数の形が変わり、Rails 8.1.3.1 の Cookie 読み込みでエラーになるため 2 系に固定する
-gem "json", "~> 2.0"
+gem "json", "~> 3.1"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
